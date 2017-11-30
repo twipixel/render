@@ -1,3 +1,6 @@
+import maxRecommendedTextures from './utils/maxRecommendedTextures';
+import canUploadSameBuffer from './utils/canUploadSameBuffer';
+
 /**
  * User's customizable globals for overriding the default PIXI settings, such
  * as a renderer's default resolution, framerate, float percision, etc.
@@ -52,6 +55,16 @@ export default {
      * @default 1
      */
     FILTER_RESOLUTION: 1,
+
+    /**
+     * The maximum textures that this device supports.
+     *
+     * @static
+     * @memberof PIXI.settings
+     * @type {number}
+     * @default 32
+     */
+    SPRITE_MAX_TEXTURES: maxRecommendedTextures(32),
 
     // TODO: maybe change to SPRITE.BATCH_SIZE: 2000
     // TODO: maybe add PARTICLE.BATCH_SIZE: 15000
@@ -195,5 +208,15 @@ export default {
      * @default PIXI.PRECISION.MEDIUM
      */
     PRECISION_FRAGMENT: 'mediump',
+
+    /**
+     * Can we upload the same buffer in a single frame?
+     *
+     * @static
+     * @constant
+     * @memberof PIXI
+     * @type {boolean}
+     */
+    CAN_UPLOAD_SAME_BUFFER: canUploadSameBuffer(),
 
 };

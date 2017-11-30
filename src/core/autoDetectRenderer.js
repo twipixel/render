@@ -1,4 +1,4 @@
-// import * as utils from './utils';
+import * as utils from './utils';
 import CanvasRenderer from './renderers/canvas/CanvasRenderer';
 // import WebGLRenderer from './renderers/webgl/WebGLRenderer';
 

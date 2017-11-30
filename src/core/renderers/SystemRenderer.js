@@ -3,12 +3,10 @@ import { Matrix, Rectangle } from '../math';
 import { RENDERER_TYPE } from '../const';
 import settings from '../settings';
 import Container from '../display/Container';
-// import RenderTexture from '../textures/RenderTexture';
+import RenderTexture from '../textures/RenderTexture';
 import EventEmitter from 'eventemitter3';
 
 const tempMatrix = new Matrix();
-
-
 
 /**
  * The SystemRenderer is the base for a PixiJS Renderer. It is extended by the {@link PIXI.CanvasRenderer}
@@ -252,8 +250,6 @@ export default class SystemRenderer extends EventEmitter
      */
     generateTexture(displayObject, scaleMode, resolution, region)
     {
-        console.log('******** SystemRenderer.generateTexture ********* 리턴 처리함');
-        return;
         region = region || displayObject.getLocalBounds();
 
         const renderTexture = RenderTexture.create(region.width | 0, region.height | 0, scaleMode, resolution);
@@ -322,7 +318,5 @@ export default class SystemRenderer extends EventEmitter
         this._backgroundColor = value;
         this._backgroundColorString = hex2string(value);
         hex2rgb(value, this._backgroundColorRgba);
-
-        console.log('backgroundColor', this._backgroundColor, 'backgroundColorString', this._backgroundColorString, 'backgroundColorRgba', this._backgroundColorRgba);
     }
 }

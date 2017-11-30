@@ -1,4 +1,13 @@
-export const VERSION = "0.9";
+/**
+ * String of the current PIXI version.
+ *
+ * @static
+ * @constant
+ * @memberof PIXI
+ * @name VERSION
+ * @type {string}
+ */
+export const VERSION = 'DEBUG';
 
 /**
  * Two Pi.

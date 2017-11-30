@@ -3,8 +3,8 @@ import settings from '../settings';
 import EventEmitter from 'eventemitter3';
 import pluginTarget from './pluginTarget';
 import * as mixins from './mixin';
-// import * as isMobile from 'ismobilejs';
-// import removeItems from 'remove-array-items';
+import * as isMobile from 'ismobilejs';
+import removeItems from 'remove-array-items';
 import mapPremultipliedBlendModes from './mapPremultipliedBlendModes';
 
 let nextUid = 0;
@@ -36,7 +36,7 @@ export {
      * @function isMobile
      * @type {Object}
      */
-    // isMobile,
+    isMobile,
 
     /**
      * @see {@link https://github.com/mreinstein/remove-array-items}
@@ -45,7 +45,7 @@ export {
      * @function removeItems
      * @type {Object}
      */
-    // removeItems,
+    removeItems,
     /**
      * @see {@link https://github.com/primus/eventemitter3}
      *
