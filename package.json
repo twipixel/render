@@ -14,8 +14,10 @@
   "author": "twipixel",
   "license": "MIT",
   "dependencies": {
+    "bit-twiddle": "^1.0.2",
     "eventemitter3": "^2.0.2",
-    "object-assign": "^4.1.1"
+    "object-assign": "^4.1.1",
+    "remove-array-items": "^1.0.0"
   },
   "devDependencies": {
     "babel-cli": "^6.24.0",
