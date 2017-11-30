@@ -1,5 +1,13 @@
+
+
+// 랜더러 사전 등록을 위해 import
+import CanvasGraphicsRenderer from './../../src/core/graphics/canvas/CanvasGraphicsRenderer';
+
+
 import Size from './../../src/utils/Size';
 import Application from './../../src/Application';
+import Graphics from './../../src/core/graphics/Graphics';
+
 
 
 export default class App
@@ -11,17 +19,17 @@ export default class App
 
         this.stage = this.app.stage;
 
-        /*const g = new Graphics();
+        const g = new Graphics();
         g.beginFill(0xff3300);
         g.drawRect(0, 0, 100, 100);
         g.endFill();
-        this.stage.addChild(g);*/
+        this.stage.addChild(g);
     }
 
 
     initialize()
     {
-        
+
     }
 
 

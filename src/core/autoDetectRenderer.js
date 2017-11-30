@@ -1,6 +1,4 @@
-import * as utils from './utils';
 import CanvasRenderer from './renderers/canvas/CanvasRenderer';
-// import WebGLRenderer from './renderers/webgl/WebGLRenderer';
 
 // eslint-disable-next-line valid-jsdoc
 /**
@@ -36,18 +34,5 @@ import CanvasRenderer from './renderers/canvas/CanvasRenderer';
  */
 export function autoDetectRenderer(options, arg1, arg2, arg3)
 {
-    // Backward-compatible support for noWebGL option
-    /*let forceCanvas = options && options.forceCanvas;
-
-    if (arg3 !== undefined)
-    {
-        forceCanvas = arg3;
-    }
-
-    if (!forceCanvas && utils.isWebGLSupported())
-    {
-        return new WebGLRenderer(options, arg1, arg2);
-    }*/
-
     return new CanvasRenderer(options, arg1, arg2);
 }

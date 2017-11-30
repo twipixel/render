@@ -1,8 +1,8 @@
 import { autoDetectRenderer } from './core/autoDetectRenderer';
-// import Container from './core/display/Container';
-// import { shared, Ticker } from './core/ticker';
-// import settings from './core/settings';
-// import { UPDATE_PRIORITY } from './core/const';
+import Container from './core/display/Container';
+import { shared, Ticker } from './core/ticker';
+import settings from './core/settings';
+import { UPDATE_PRIORITY } from './core/const';
 
 /**
  * Convenience class to create a new PIXI application.
