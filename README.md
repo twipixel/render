@@ -1,4 +1,18 @@
-PIXI 소스 분석을 위한 저장소입니다.
+# 2D
+
+ 
+ 
+## 설치:
 
 
+    npm install
+    
+    
 
+## 실행:
+
+
+    npm run build (빌드)
+    npm run dev(개발 테스트)
+    
+     

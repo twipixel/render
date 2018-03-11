@@ -110,7 +110,7 @@ coverage
 .grunt
 
 # Compiled binary addons (http://nodejs.org/api/addons.html)
-# build/Release
+build/Release
 
 # Dependency directory
 # Commenting this out is preferred by some people, see
@@ -126,7 +126,7 @@ node_modules
 .LSOverride
 
 # Icon must end with two \r
-# Icon
+Icon
 
 # Thumbnails
 ._*
@@ -148,7 +148,7 @@ Temporary Items
 .LSOverride
 
 # Icon must end with two \r
-# Icon
+Icon
 
 # Thumbnails
 ._*
@@ -165,8 +165,6 @@ Temporary Items
 .apdisk
 
 # Project Setting
-# dist
-# *.min.js
-# *.bundle.js
-
+dist
+build
 

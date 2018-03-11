@@ -1,26 +1,115 @@
 
-const fs = require('fs')
-    , path = require('path')
-    , webpack = require('webpack')
-    , CopyWebpackPlugin = require('copy-webpack-plugin')
-    , BrowserSyncPlugin = require('browser-sync-webpack-plugin');
+const fs = require('fs');
+const path = require('path');
+const webpack = require('webpack');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+const BrowserSyncPlugin = require('browser-sync-webpack-plugin');
 
-const REG_JS = /\.js$/
-    , REG_MAP = /\.map$/gi
-    , REG_SRC = /src$/i
-    , REG_HTML = /\.html$/
-    , REG_DOT_FOLDER = /^\./
-    , REG_MIN = /\.min\.js/gi
-    , REG_MODULES = /modules$/i
-    , REG_BUNDLE = /\.bundle\.js/gi;
+const regJS = /\.js$/;
+const regMD = /\.md$/;
+const regMap = /\.map$/gi;
+const regHTML = /\.html$/;
+const regDotFolder = /^\./;
+const regMin = /\.min\.js/gi;
+const regModules = /modules$/i;
+const regBundle = /\.bundle\.js/gi;
 
-const PATH_SRC = './src/'
-    , PATH_DIST = './dist/'
-    , PATH_TEST = './test/'
-    , PATH_ASSETS = PATH_TEST + 'assets/'
-    , PATH_LIB = PATH_ASSETS + 'lib/'
-    , PATH_VENDOR = PATH_ASSETS + 'vendor/'
-    , PATH_NODE_MODULES = './node_modules';
+const PATH_SRC = './src/';
+const PATH_TEST = './test/';
+const PATH_DIST = './dist/';
+const PATH_ASSET = './asset/';
+const PATH_EXTERNAL_LIB = './external/lib/';
+const PATH_EXTERNAL_VENDOR = './external/vendor/';
+const PATH_NODE_MODULES = './node_modules/';
+
+
+/**
+ * setRoot 함수에서
+ * modules.filter(dir => regModules.test(dir)) 실행 과정을 출력합니다.
+ * @param modules
+ */
+const debugSetRoot = modules => {
+
+    console.log('\n DebugSetRoot');
+    console.log('----------------------------------------');
+    console.log('fs.readdirSync(PATH_SRC, utf8) -> modules:', modules);
+    console.log('----------------------------------------');
+
+    var copy = modules.slice(0);
+
+    copy.forEach(dir => {
+        console.log('regModules.test(' + dir + '):', regModules.test(dir));
+    });
+    var filterResult = copy.filter(dir => regModules.test(dir));
+    console.log('modules.filter(dir => regModules.test(dir)) -> [' + filterResult.toString() + ']');
+};
+
+
+/**
+ * 모듈 탐색을 시작할 루트 경로 설정
+ * require(모듈명)에서의 모듈명을 어떻게 해석할지에 대한 옵션.
+ * @param list
+ * @returns {Array}
+ */
+const setRoot = list => {
+    /**
+     * fs.readdir 동기 버전
+     * 디렉토리에서 '.'와 '..'를 제외한 파일명들의 배열이다.
+     * http://nodejs.sideeffect.kr/docs/v0.8.20/api/fs.html#fs_fs_readdirsync_path
+     */
+    const modules = fs.readdirSync(PATH_SRC, 'utf8') || [];
+
+    debugSetRoot(modules);
+
+    /**
+     * path.resolve
+     * 전달받은 경로의 절대경로를 돌려줍니다.
+     */
+    var result = modules
+        .filter(dir => regModules.test(dir))
+        .map(dir => './src/' + dir)
+        .concat(list || [])
+        .map(dir => path.resolve(dir));
+
+    console.log('resolve.root:', result);
+
+    return result;
+};
+
+
+
+const setEntry = list => {
+    console.log('\n[SetEntry Start]');
+    console.log('-----------------------------------');
+    console.log('setEntry, arguments:\n', list);
+
+    /**
+     * .DS_Store 폴더 제거
+     * Arrow Function 은 기본이 결과를 return 합니다.
+     * https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Functions/%EC%95%A0%EB%A1%9C%EC%9A%B0_%ED%8E%91%EC%85%98
+     */
+    list = list
+        .filter(entry => regMD.test(entry) === false)
+        .filter(entry => regHTML.test(entry) === false)
+        .filter(entry => regDotFolder.test(entry) === false);
+
+    console.log('fiter result:\n', list);
+
+    /**
+     * Array.reduce
+     * reduce() 메서드는 누산기(accumulator) 및 배열의 각 값(좌에서 우로)에 대해 (누산된) 한 값으로 줄도록 함수를 적용합니다.
+     * https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Global_Objects/Array/Reduce
+     */
+    var result = list.reduce((entry, app) => {
+        app = app.replace(regJS, '');
+        entry[app] = PATH_TEST + app + '/index.js';
+        return entry;
+    }, {});
+
+    console.log('RESULT:\n', result);
+    console.log('[SetEntry End]\n');
+    return result;
+};
 
 
 
@@ -55,24 +144,18 @@ const base = {
      * require('xxx.js')가 아니라 require('xxx')로 로드할 수 있습니다.
      */
     resolve: {
-        root: [
-            path.resolve(__dirname, PATH_LIB),
-            path.resolve(__dirname, PATH_VENDOR),
-            path.resolve(__dirname, PATH_NODE_MODULES)
-        ],
+        root: setRoot([PATH_NODE_MODULES, PATH_EXTERNAL_LIB, PATH_EXTERNAL_VENDOR])
     },
 
-    entry: {
-        './dist/create/index': './test/create/index.js',
-    },
+    entry: setEntry(fs.readdirSync(PATH_TEST, 'utf8')),
 
     /**
      * publicPath: 웹사이트에서 해당 에셋에 접근하기 위해 필요한 경로.
      */
     output: {
-        path: './',
-        filename: '[name].js',
-        publicPath: PATH_ASSETS,
+        path: PATH_DIST + 'bundle',
+        publicPath: PATH_ASSET,
+        filename: '[name].js'
     },
 
     plugins: [
@@ -80,7 +163,7 @@ const base = {
         /**
          * 공통으로 사용하는 파일을 뽑아주는 플러그인
          */
-        new webpack.optimize.CommonsChunkPlugin('./dist/bundle/commons.js'),
+        new webpack.optimize.CommonsChunkPlugin('commons.js'),
         /**
          * 브라우저 환경의 전역 scope 로 미리 등록시켜주는 플러그인
          */
@@ -91,14 +174,24 @@ const base = {
 
         new CopyWebpackPlugin([
             {
+                from: PATH_TEST + 'index.html',
+                to: './../'
+            },
+            {
                 context: PATH_TEST,
                 from: '**/*',
-                to: PATH_DIST,
+                to: './../',
+                transform: content =>
+                    new Buffer(content).toString('utf-8').replace(regBundle, '.min.js'),
                 ignore: '*.js'
-            },
-            {from: PATH_ASSETS, to: PATH_DIST + 'assets'},
-        ]),
-
+            }
+        ], {
+            ignore: [
+                'ui.html',
+                'asset.html',
+                '*.md'
+            ]
+        })
     ]
 };
 
@@ -109,7 +202,7 @@ const production = {
     module: {
         loaders: [
             {
-                test: REG_JS,
+                test: regJS,
                 /**
                  * exclude 프로퍼티를 이용해 제외할 디렉토리를 정하거나
                  * include 프로퍼티를 이용해 적용시킬 디렉토리만 따로 설정 할 수도 있다.
@@ -162,7 +255,7 @@ const development = {
      * inline-source-map: 컴파일된 파일에서도 원래의 파일 구조를 확인할 수 있는 옵션
      * (inline 은 map 파일을 따로 생성하지 않고 bundle에 포함 시킵니다.)
      */
-    devtool: 'sourcemap',
+    devtool: '#inline-source-map',
     plugins: [
         new BrowserSyncPlugin({
             host: 'localhost',
@@ -205,13 +298,13 @@ const development = {
      */
 
     /*devServer: {
-        port: 9000,
-        // contentBase: path.resolve('src/'),
-        // inline: true,
-        progress: true,
-        colors: true,
-        publicPath:path.resolve('assets'),
-    }*/
+     port: 9000,
+     // contentBase: path.resolve('src/'),
+     // inline: true,
+     progress: true,
+     colors: true,
+     publicPath:path.resolve('assets'),
+     }*/
 };
 
 
@@ -219,7 +312,7 @@ const development = {
  * package.json 을 통해
  * production 과 development 를 구분 지을 수 있다.
  *
- * "scripts": {
+ * "scripts": {np
     "build": "NODE_ENV=production webpack",
     "start": "NODE_ENV=development webpack-dev-server --content-base ./build"
     }
