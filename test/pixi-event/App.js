@@ -4,7 +4,7 @@ export default class App
 {
     constructor()
     {
-        console.log('pixi-event-emitter');
+        console.log('pixi-event');
         this.initialize();
     }
 
