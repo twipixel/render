@@ -5,8 +5,7 @@
   "main": "./test/basic/index.html",
   "scripts": {
     "build": "webpack --build",
-    "start": "webpack",
-    "2d": "electron electron-2d.js"
+    "start": "webpack"
   },
   "repository": {
     "type": "git",
