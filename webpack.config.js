@@ -12,6 +12,7 @@ const regHTML = /\.html$/;
 const regDotFolder = /^\./;
 const regMin = /\.min\.js/gi;
 const regModules = /modules$/i;
+const regAssets = /assets/i;
 const regBundle = /\.bundle\.js/gi;
 
 const PATH_SRC = './src/';
@@ -91,7 +92,8 @@ const setEntry = list => {
     list = list
         .filter(entry => regMD.test(entry) === false)
         .filter(entry => regHTML.test(entry) === false)
-        .filter(entry => regDotFolder.test(entry) === false);
+        .filter(entry => regDotFolder.test(entry) === false)
+        .filter(entry => regAssets.test(entry) === false);
 
     console.log('fiter result:\n', list);
 
