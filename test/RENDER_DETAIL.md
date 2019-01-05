@@ -32,7 +32,22 @@ app.ticker.add(function(delta) {
 
 ### 요약
 
-> Application.render -> Renderer.render -> DisplayObject.renderCanvas -> 	DisplayObject._renderCanvas
+Application.renderer.render(this.stage)
+
+- renderer
+  - CanvasRenderer
+    - displayObject.renderCanvas(this)
+      - Container._renderCanvas(renderer)
+        - Graphics._renderCanas(renderer)
+          - renderer.plugins.graphics.render(this)
+            - CanvasGraphicsRenderer.render(**graphics**)
+  - WebGLRenderer
+    - displayObject.renderWebGL(this)
+      - Container._renderWebGL(renderer)
+        - Graphics._renderWebGL(renderer)
+          - renderer.setObjectRenderer(renderer.plugins.graphics)
+          - renderer.plugis.graphics.render(this)
+            - GraphicsRenderer.render(**graphics**)
 
 
 
@@ -262,6 +277,136 @@ CanvasRenderer.registerPlugin('graphics', CanvasGraphicsRenderer);
 
 
 
+### GraphicsData 생성 과정
+
+#### Graphics
+
+lineStyle, drawRect, drawRoundedRect, drawCircle 등 호출 할때 마다 drawShape 을 호출합니다.
+
+```js
+drawShape(shape)
+{
+    if (this.currentPath)
+    {
+        // check current path!
+        if (this.currentPath.shape.points.length <= 2)
+        {
+            this.graphicsData.pop();
+        }
+    }
+
+    this.currentPath = null;
+
+    const data = new GraphicsData(
+        this.lineWidth,
+        this.lineColor,
+        this.lineAlpha,
+        this.fillColor,
+        this.fillAlpha,
+        this.filling,
+        this.nativeLines,
+        shape
+    );
+
+    this.graphicsData.push(data);
+
+    if (data.type === SHAPES.POLY)
+    {
+        data.shape.closed = data.shape.closed || this.filling;
+        this.currentPath = data;
+    }
+
+    this.dirty++;
+
+    return data;
+}
+```
+
+
+
+### GraphicsData
+
+> constructor(lineWidth, lineColor, lineAlpha, fillColor, fillAlpha, fill, nativeLines, shape)
+
+- nativeLines {boolean} if true the liens will be draw using LINES instead of TRIANGLE_STRIP
+
+
+
+### WebGLGraphicsData
+
+> constructor(gl, shader, attribsState)
+
+- {WebGLRenderingContext} gl - The current WebGL drawing context
+- {PIXI.Shader} shader - The shader
+- {object} attribsState - The state for the VAO
+
+```js
+/**
+ * The current WebGL drawing context
+ *
+ * @member {WebGLRenderingContext}
+ */
+this.gl = gl;
+
+// TODO does this need to be split before uploading??
+/**
+ * An array of color components (r,g,b)
+ * @member {number[]}
+ */
+this.color = [0, 0, 0]; // color split!
+
+/**
+ * An array of points to draw
+ * @member {PIXI.Point[]}
+ */
+this.points = [];
+
+/**
+ * The indices of the vertices
+ * @member {number[]}
+ */
+this.indices = [];
+/**
+ * The main buffer
+ * @member {WebGLBuffer}
+ */
+this.buffer = glCore.GLBuffer.createVertexBuffer(gl);
+
+/**
+ * The index buffer
+ * @member {WebGLBuffer}
+ */
+this.indexBuffer = glCore.GLBuffer.createIndexBuffer(gl);
+
+/**
+ * Whether this graphics is dirty or not
+ * @member {boolean}
+ */
+this.dirty = true;
+
+/**
+ * Whether this graphics is nativeLines or not
+ * @member {boolean}
+ */
+this.nativeLines = false;
+
+this.glPoints = null;
+this.glIndices = null;
+
+/**
+ *
+ * @member {PIXI.Shader}
+ */
+this.shader = shader;
+
+this.vao = new glCore.VertexArrayObject(gl, attribsState)
+.addIndex(this.indexBuffer)
+.addAttribute(this.buffer, shader.attributes.aVertexPosition, gl.FLOAT, false, 4 * 6, 0)
+.addAttribute(this.buffer, shader.attributes.aColor, gl.FLOAT, false, 4 * 6, 2 * 4);
+```
+
+
+
 ### CanvasGraphicsRenderer 랜더링
 
 > render(graphics)
@@ -432,7 +577,7 @@ for (let i = 0; i < graphics.graphicsData.length; i++) {
 
 ### GraphicsRenderer 랜더링 (WebGL)
 
-> render(graphics)
+> render(graphics) 
 
 ```js
 render(graphics)
@@ -473,6 +618,115 @@ render(graphics)
             webGLData.vao.draw(gl.TRIANGLE_STRIP, webGLData.indices.length);
         }
     }
+}
+```
+
+
+
+#### Graphics._webgl.data 
+
+GraphicsRenderer.updateGraphics 에서 생성
+
+
+
+> updateGraphics(graphics)
+
+```js
+updateGraphics(graphics)
+{
+    const gl = this.renderer.gl;
+
+    // get the contexts graphics object
+    let webGL = graphics._webGL[this.CONTEXT_UID];
+
+    // if the graphics object does not exist in the webGL context time to create it!
+    if (!webGL) {
+        webGL = graphics._webGL[this.CONTEXT_UID] = { lastIndex: 0, data: [], gl, clearDirty: -1, dirty: -1 };
+    }
+
+    // flag the graphics as not dirty as we are about to update it...
+    webGL.dirty = graphics.dirty;
+
+    // if the user cleared the graphics object we will need to clear every object
+    if (graphics.clearDirty !== webGL.clearDirty) {
+        webGL.clearDirty = graphics.clearDirty;
+
+        // loop through and return all the webGLDatas to the object pool so than can be reused later on
+        for (let i = 0; i < webGL.data.length; i++) {
+            this.graphicsDataPool.push(webGL.data[i]);
+        }
+
+        // clear the array and reset the index..
+        webGL.data.length = 0;
+        webGL.lastIndex = 0;
+    }
+
+    let webGLData;
+    let webGLDataNativeLines;
+
+    // loop through the graphics datas and construct each one..
+    // if the object is a complex fill then the new stencil buffer technique will be used
+    // other wise graphics objects will be pushed into a batch..
+    for (let i = webGL.lastIndex; i < graphics.graphicsData.length; i++) {
+        const data = graphics.graphicsData[i];
+
+        // TODO - this can be simplified
+        webGLData = this.getWebGLData(webGL, 0);
+
+        if (data.nativeLines && data.lineWidth) {
+            webGLDataNativeLines = this.getWebGLData(webGL, 0, true);
+            webGL.lastIndex++;
+        }
+
+        if (data.type === SHAPES.POLY) {
+            buildPoly(data, webGLData, webGLDataNativeLines);
+        }
+        if (data.type === SHAPES.RECT) {
+            buildRectangle(data, webGLData, webGLDataNativeLines);
+        }
+        else if (data.type === SHAPES.CIRC || data.type === SHAPES.ELIP) {
+            buildCircle(data, webGLData, webGLDataNativeLines);
+        }
+        else if (data.type === SHAPES.RREC) {
+            buildRoundedRectangle(data, webGLData, webGLDataNativeLines);
+        }
+
+        webGL.lastIndex++;
+    }
+
+    this.renderer.bindVao(null);
+
+    // upload all the dirty data...
+    for (let i = 0; i < webGL.data.length; i++) {
+        webGLData = webGL.data[i];
+
+        if (webGLData.dirty) {
+            webGLData.upload();
+        }
+    }
+}
+```
+
+
+
+> getWebGLData(gl, type, nativeLines)
+
+```js
+getWebGLData(gl, type, nativeLines)
+{
+    let webGLData = gl.data[gl.data.length - 1];
+
+    if (!webGLData || webGLData.nativeLines !== nativeLines || webGLData.points.length > 320000) {
+        webGLData = this.graphicsDataPool.pop()
+            || new WebGLGraphicsData(this.renderer.gl, this.primitiveShader, this.renderer.state.attribsState);
+        webGLData.nativeLines = nativeLines;
+        webGLData.reset(type);
+        gl.data.push(webGLData);
+    }
+
+    webGLData.dirty = true;
+
+    return webGLData;
 }
 ```
 
