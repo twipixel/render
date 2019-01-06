@@ -204,6 +204,35 @@ var someThingSomeVec2Loc = gl.getUniformLocation(someProgram, "u_someThing.someV
 
 베어링은 버텍스 셰이더에서 프래그먼트 셰이더로 데이타를 전달하는 방법을 제공. 버텍스 셰이더에서 제공하는 데이타를 베어링을 통해서 프렉먼트 셰이더에 전달해줌으로써 프래그먼트 셰이더에 정의된 특정 보간 처리를 수행할 수 있다. 그래서 베어링은 버텍스 셰이더(제공 측)와 프래그먼트 셰이더(사용 측) 둘 다 선언되어야 한다.
 
+##### [Frame Buffer](http://iskim3068.tistory.com/21)
+
+래스터 주사 방식에서 화면에 나타날 영상 정보를 일시적으로 저장하는 기억 장치.
+
+##### [FiledOfView (FOV)](https://webglfundamentals.org/webgl/lessons/webgl-3d-perspective.html)
+
+화각
+
+##### Perspective 
+
+원근 투영
+
+```js
+var m4 = {
+  perspective: function(fieldOfViewInRadians, aspect, near, far) {
+    var f = Math.tan(Math.PI * 0.5 - 0.5 * fieldOfViewInRadians);
+    var rangeInv = 1.0 / (near - far);
+ 
+    return [
+      f / aspect, 0, 0, 0,
+      0, f, 0, 0,
+      0, 0, (near + far) * rangeInv, -1,
+      0, 0, near * far * rangeInv * 2, 0
+    ];
+  },
+ 
+  ...
+```
+
 
 
 ## 애트리뷰트와 버퍼
@@ -319,4 +348,83 @@ void main() {
 }
 </script>
 ```
+
+
+
+## [2D projection 설명](https://webglfundamentals.org/webgl/lessons/ko/webgl-2d-matrices.html)
+
+shader 안에 픽셀을 clip 공간으로 전환하는 코드
+
+```js
+...
+// 사각형의 픽셀을 0.0에서 1.0사이로 전환
+vec2 zeroToOne = position / u_resolution;
+
+// 0->1에서 0->2로 전환
+vec2 zeroToTwo = zeroToOne * 2.0;
+
+// 0->2에서 -1->+1로 전환 (clipspace)
+vec2 clipSpace = zeroToTwo - 1.0;
+
+gl_Position = vec4(clipSpace * vec2(1, -1), 0, 1);
+```
+
+###### 위 코드를 행렬로 변환 결과
+
+```js
+var m3 = {
+  projection: function(width, height) {
+    // 참고: 이 행렬은 Y축을 뒤집어서 0이 상단에 있도록 합니다.
+    return [
+      2 / width, 0, 0,
+      0, -2 / height, 0,
+      -1, 1, 1
+    ];
+  },
+ 
+  ...
+```
+
+###### 수정된  vertex shader 코드
+
+```js
+attribute vec2 a_position;
+ 
+uniform mat3 u_matrix;
+ 
+void main() {
+  // Multiply the position by the matrix.
+  gl_Position = vec4((u_matrix * vec3(a_position, 1)).xy, 0, 1);
+}
+```
+
+###### projection 행렬 적용 코드
+
+```js
+// 화면 그리기
+function drawScene() {
+    ...
+
+    // 행렬 계산
+    var projectionMatrix = m3.projection(
+        gl.canvas.clientWidth, gl.canvas.clientHeight);
+
+    ...
+
+    // 행렬 곱하기
+    var matrix = m3.multiply(projectionMatrix, translationMatrix);
+    matrix = m3.multiply(matrix, rotationMatrix);
+    matrix = m3.multiply(matrix, scaleMatrix);
+
+    ...
+}
+```
+
+
+
+## [행렬 곱 순서](https://webglfundamentals.org/webgl/lessons/ko/webgl-2d-matrices.html)
+
+SRT (Scale, Rotation, Translation)
+
+이유는 원점을 중심으로 스케일, 회전하고 이동을 해야 하기 때문
 
