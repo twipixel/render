@@ -9,6 +9,7 @@ export default class App {
   }
 
   test() {
+    // 폰트의 넓이와 높이 구하는 방법 확인
     // https://pixijs.io/pixi-text-style/#%7B%22style%22%3A%7B%22fill%22%3A%22%232db400%22%2C%22fontFamily%22%3A%22Helvetica%22%2C%22fontSize%22%3A25%2C%22fontStyle%22%3A%22italic%22%2C%22fontVariant%22%3A%22small-caps%22%2C%22fontWeight%22%3A%22bold%22%2C%22letterSpacing%22%3A30%2C%22lineJoin%22%3A%22round%22%2C%22stroke%22%3A%22%231eb7d9%22%2C%22strokeThickness%22%3A2%7D%2C%22background%22%3A%22%23128e15%22%7D
     // const text = new PIXI.Text('Hello World', style);
     var div = document.getElementById('root');
@@ -33,5 +34,15 @@ export default class App {
 
     // fillText(text, x, y, [, maxWidth])
     // strokeText(text, x, y [, maxWidth])
+
+
+  }
+
+  measureText(text, style, canvas) {
+
+  }
+
+  measureFont(font) {
+
   }
 }

@@ -34,6 +34,10 @@
 - loop
   - renderer.render(stage);
 
+#### Text 
+
+- 텍스트 넓이 높이 구하기
+
 ##### 랜더링
 
 - Application
