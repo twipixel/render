@@ -21891,7 +21891,7 @@
      * @memberof PIXI
      */
 
-    var Text = function (_Sprite) {
+    var TefontFamilyxt = function (_Sprite) {
         _inherits(Text, _Sprite);
 
         /**
