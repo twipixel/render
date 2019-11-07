@@ -40,9 +40,7 @@
   }
   ```
 
-- **클릭 좌표의 역행렬을 구해서 클릭 감지**
-
-- **회전시에도 적용 되는지 테스트**
+- **클릭 좌표의 역행렬을 구해서 클릭 감지**(**회전시에도 적용 되는지 테스트**)
 
 - 이 부분 테스트 코드로 작성
 
@@ -56,7 +54,7 @@
   }
   ```
 
-- Rectangle contains
+- Rectangle
 
 - ```js
   contains(x, y) {
@@ -74,7 +72,84 @@
   }
   ```
 
-- Polygon contains
+- RoundedRectangle
+
+- ```js
+  contains(x, y) {
+   if (this.width <= 0 || this.height <= 0) {
+    return false;
+   }
+   if (x >= this.x && x <= this.x + this.width) {
+    if (y >= this.y && y <= this.y + this.height) {
+     if ((y >= this.y + this.radius && y <= this.y + this.height - this.radius) ||
+      (x >= this.x + this.radius && x <= this.x + this.width - this.radius)) {
+      return true;
+     }
+     let dx = x - (this.x + this.radius);
+     let dy = y - (this.y + this.radius);
+     const radius2 = this.radius * this.radius;
+  
+     if ((dx * dx) + (dy * dy) <= radius2) {
+      return true;
+     }
+     dx = x - (this.x + this.width - this.radius);
+     if ((dx * dx) + (dy * dy) <= radius2) {
+      return true;
+     }
+     dy = y - (this.y + this.height - this.radius);
+     if ((dx * dx) + (dy * dy) <= radius2) {
+      return true;
+     }
+     dx = x - (this.x + this.radius);
+     if ((dx * dx) + (dy * dy) <= radius2) {
+      return true;
+     }
+    }
+   }
+  
+   return false;
+  }
+  ```
+
+- Circle
+
+- ```js
+  contains(x, y) {
+   if (this.radius <= 0) {
+    return false;
+   }
+  
+   const r2 = this.radius * this.radius;
+   let dx = (this.x - x);
+   let dy = (this.y - y);
+  
+   dx *= dx;
+   dy *= dy;
+  
+   return (dx + dy <= r2);
+  }
+  ```
+
+- Ellipse
+
+- ```js
+  contains(x, y) {
+   if (this.width <= 0 || this.height <= 0) {
+    return false;
+   }
+  
+   // normalize the coords to an ellipse with center 0,0
+   let normx = ((x - this.x) / this.width);
+   let normy = ((y - this.y) / this.height);
+  
+   normx *= normx;
+   normy *= normy;
+  
+   return (normx + normy <= 1);
+  }
+  ```
+
+- Polygon
 
 - ```js
   contains(x, y) {
@@ -136,3 +211,38 @@
   - TilingSprite
 
   - Graphics
+
+  - ```js
+    containsPoint(point) {
+     this.worldTransform.applyInverse(point, tempPoint);
+    
+     const graphicsData = this.graphicsData;
+    
+     for (let i = 0; i < graphicsData.length; ++i) {
+      const data = graphicsData[i];
+    
+      if (!data.fill) {
+       continue;
+      }
+    
+      // only deal with fills..
+      if (data.shape) {
+       if (data.shape.contains(tempPoint.x, tempPoint.y)) {
+        if (data.holes) {
+         for (let i = 0; i < data.holes.length; i++) {
+          const hole = data.holes[i];
+    
+          if (hole.contains(tempPoint.x, tempPoint.y)) {
+           return false;
+          }
+         }
+        }
+    
+        return true;
+       }
+      }
+     }
+    
+     return false;
+    }
+    ```

@@ -5,6 +5,10 @@ export default class App {
   }
 
   initialize() {
+    this.polygons = [
+      [],
+    ];
+
     this.test();
   }
 
