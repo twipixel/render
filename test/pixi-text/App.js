@@ -1,3 +1,6 @@
+import getTimeLabel from './../../src/console/getTimeLabel';
+import { expandedLog, stringify } from './../../src/console/expandedLog';
+
 export default class App {
   constructor() {
     console.log('pixi-text');
@@ -86,12 +89,16 @@ export default class App {
 
     // 폰트 넓이 / 높이 테스트
     var div2 = document.createElement('div');
+
+    console.time(getTimeLabel('캔버스 생성'));
     var canvas2 = document.createElement('canvas');
     div2.appendChild(canvas2);
     document.body.appendChild(div2);
     var context2 = canvas2.getContext('2d');
-    context2.font = font;
+    console.timeEnd(getTimeLabel('캔버스 생성'));
 
+    console.time(getTimeLabel('width / height 측정'));
+    context2.font = font;
     const width = Math.ceil(context.measureText('|MÉq').width);
     let baseline = Math.ceil(context.measureText('M').width);
     const height = 2 * baseline;
@@ -178,6 +185,7 @@ export default class App {
 
     properties.descent = i - baseline;
     properties.fontSize = properties.ascent + properties.descent;
+    console.timeEnd(getTimeLabel('width / height 측정'));
     console.log('ascent', properties.ascent);
     console.log('descent', properties.descent);
     console.log('fontSize', properties.fontSize);
