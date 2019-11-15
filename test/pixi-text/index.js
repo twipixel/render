@@ -5,6 +5,10 @@ import KeyCode from '../../src/consts/KeyCode';
 (function () {
     window.onload = function () {
         var main = new Main();
+        this.app = main.app;
+
+        console.log('this', this);
+        console.log('main', main);
     }
 }());
 
