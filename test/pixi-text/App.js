@@ -11,6 +11,10 @@ export default class App {
     this.test();
   }
 
+  /**
+   * canvas 에서 font 높이 찾는 방법
+   * http://stackz.ru/en/1134586/how-can-you-find-the-height-of-text-on-an-html-canvas
+   */
   test() {
     const style = new PIXI.TextStyle({
       fontFamily: 'Arial',
@@ -32,7 +36,6 @@ export default class App {
     const xShadowOffset = Math.cos(style.dropShadowAngle) * style.dropShadowDistance;
     const yShadowOffset = Math.sin(style.dropShadowAngle) * style.dropShadowDistance;
 
-    // ** 적은 성능으로 폰트의 넓이와 높이 구하는 방법 확인 **
     // https://pixijs.io/pixi-text-style/#%7B%22style%22%3A%7B%22fill%22%3A%22%232db400%22%2C%22fontFamily%22%3A%22Helvetica%22%2C%22fontSize%22%3A25%2C%22fontStyle%22%3A%22italic%22%2C%22fontVariant%22%3A%22small-caps%22%2C%22fontWeight%22%3A%22bold%22%2C%22letterSpacing%22%3A30%2C%22lineJoin%22%3A%22round%22%2C%22stroke%22%3A%22%231eb7d9%22%2C%22strokeThickness%22%3A2%7D%2C%22background%22%3A%22%23128e15%22%7D
     // const text = new PIXI.Text('Hello World', style);
     var div = document.createElement('div');
