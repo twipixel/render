@@ -79,7 +79,22 @@
                         <li><a href="pixi-interaction/index.html" target="frame">Interaction</a></li>
                     </ul>
                 </li>
-
+                <li class="sub-menu dcjq-parent-li">
+                    <!--<a href="javascript:" class="dcjq-parent active">
+                        <span>BASIC</span>
+                    </a>
+                    <ul class="sub">
+                        <li><a href="basic-event/index.html" target="frame">Event</a></li>
+                        <li><a href="basic-display/index.html" target="frame">Display</a></li>
+                    </ul>-->
+                    <a href="javascript:" class="dcjq-parent active">
+                        <!--<i class="fa fa-desktop"></i>-->
+                        <span>WebGL</span>
+                    </a>
+                    <ul class="sub">
+                        <li><a href="webgl-simple-triangle/index.html" target="frame">Simple Triangle</a></li>
+                    </ul>
+                </li>
             </ul>
             <!-- sidebar menu end-->
         </div>
@@ -127,7 +142,8 @@
         frame.name = 'frame';
         frame.frameBorder = 0;
         frame.scrolling = 'no';
-        frame.src = 'pixi-interaction/index.html';
+        // frame.src = 'pixi-interaction/index.html';
+        frame.src = 'webgl-simple-triangle/index.html';
         parent.appendChild(frame);
 
     }());
