@@ -6,9 +6,6 @@ import KeyCode from '../../src/consts/KeyCode';
     window.onload = function () {
         var main = new Main();
         this.app = main.app;
-
-        console.log('this', this);
-        console.log('main', main);
     }
 }());
 
@@ -44,12 +41,6 @@ class Main
                 console.clear();
                 break;
             case KeyCode.SPACE:
-                if (this.app.gui.closed) {
-                    this.app.gui.open();
-                }
-                else {
-                    this.app.gui.close();
-                }
                 break;
             case KeyCode.DOWN:
                 break;

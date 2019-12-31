@@ -6,9 +6,6 @@ import KeyCode from '../../src/consts/KeyCode';
     window.onload = function () {
         var main = new Main();
         this.app = main.app;
-
-        console.log('this', this);
-        console.log('main', main);
     }
 }());
 
@@ -29,7 +26,7 @@ class Main
     addEvent()
     {
         window.onresize = this.onresize.bind(this);
-        window.addEventListener('keyup', this.onkeyup.bind(this));
+        window.frames.addEventListener('keyup', this.onkeyup.bind(this));
     }
 
     onresize()

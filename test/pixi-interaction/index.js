@@ -25,7 +25,7 @@ class Main
     addEvent()
     {
         window.onresize = this.onresize.bind(this);
-        window.addEventListener('keyup', this.onkeyup.bind(this));
+        window.frames.addEventListener('keyup', this.onkeyup.bind(this));
     }
 
     onresize()

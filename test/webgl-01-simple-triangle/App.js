@@ -26,8 +26,13 @@ var fragmentShaderText =
   ].join('\n');
 
 export default class App {
+  /**
+   * WebGL Tutorial 01 - Setup and Triangle
+   * https://www.youtube.com/user/IntroTutorials1/videos
+   * https://github.com/sessamekesh/IndigoCS-webgl-tutorials
+   */
   constructor() {
-    console.log('webgl-simple-triangle');
+    console.log('WebGL Simple Triangle');
     this.run();
   }
 
