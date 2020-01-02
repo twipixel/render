@@ -33,6 +33,7 @@ export default class App {
    * WebGL Tutorial 02
    * https://www.youtube.com/user/IntroTutorials1/videos
    * https://github.com/sessamekesh/IndigoCS-webgl-tutorials
+   * https://opengameart.org/content/simple-toon-wooden-crate-texture
    */
   constructor() {
     console.log('WebGL Rotating 3D Cube');
