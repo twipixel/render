@@ -7,7 +7,7 @@
     <meta name="author" content="twipixel">
     <meta name="keyword" content="2d">
 
-    <title>2D</title>
+    <title>Render</title>
 
     <!-- Bootstrap core CSS -->
     <link href="../../asset/bootstrap/css/bootstrap.css" rel="stylesheet">
@@ -36,7 +36,7 @@
             <div class="fa fa-bars tooltips" data-placement="right" data-original-title="Toggle Navigation"></div>
         </div>
         <!--logo start-->
-        <a href="index.html" class="logo"><b>2D</b></a>
+        <a href="index.html" class="logo"><b>Render</b></a>
         <!--logo end-->
 
         <div class="top-menu">
@@ -97,6 +97,22 @@
                         <li><a href="webgl-03-textured-cube/index.html" target="frame">03.Textured Cube</a></li>
                     </ul>
                 </li>
+                <li class="sub-menu dcjq-parent-li">
+                    <!--<a href="javascript:" class="dcjq-parent active">
+                        <span>BASIC</span>
+                    </a>
+                    <ul class="sub">
+                        <li><a href="basic-event/index.html" target="frame">Event</a></li>
+                        <li><a href="basic-display/index.html" target="frame">Display</a></li>
+                    </ul>-->
+                    <a href="javascript:" class="dcjq-parent active">
+                        <!--<i class="fa fa-desktop"></i>-->
+                        <span>TEST</span>
+                    </a>
+                    <ul class="sub">
+                        <li><a href="test-equation/index.html" target="frame">Equation</a></li>
+                    </ul>
+                </li>
             </ul>
             <!-- sidebar menu end-->
         </div>
@@ -145,7 +161,8 @@
         frame.frameBorder = 0;
         frame.scrolling = 'no';
         // frame.src = 'pixi-interaction/index.html';
-        frame.src = 'webgl-03-textured-cube/index.html';
+        // frame.src = 'webgl-03-textured-cube/index.html';
+        frame.src = 'test-equation/index.html';
         parent.appendChild(frame);
 
     }());
