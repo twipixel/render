@@ -36,10 +36,11 @@ export default class App {
    */
   constructor() {
     console.log('WebGL Rotating 3D Cube');
-    this.run();
+    this.init();
+    this.initGUI();
   }
 
-  run() {
+  init() {
     var canvas = this.canvas = document.getElementById('canvas');
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
@@ -208,7 +209,25 @@ export default class App {
     var viewMatrix = new Float32Array(16);
     var projMatrix = new Float32Array(16);
     mat4.identity(worldMatrix);
+
+    /**
+     * lookAt(out, eye, center, up)
+     * http://glmatrix.net/docs/module-mat4.html
+     * eye: 카메라는 월드 좌표에서 (0, 0, -8) 에 있다.
+     * center: 카메라는 원점을 본다.
+     * up: 머리가 위쪽
+     */
     mat4.lookAt(viewMatrix, [0, 0, -8], [0, 0, 0], [0, 1, 0]);
+
+    /**
+     * http://www.opengl-tutorial.org/kr/beginners-tutorials/tutorial-3-matrices/
+     * perspective(out, fov, aspect, near, far)
+     * http://glmatrix.net/docs/module-mat4.html
+     * fov: 수직방향 시야각
+     * aspect: 화면 비 (w / h)
+     * near: Near clipping plane (근거리 잘라내기 평면)
+     * far: Far clipping plane (원거리 잘라내기 평면)
+     */
     mat4.perspective(projMatrix, glMatrix.toRadian(45), canvas.width / canvas.height, 0.1, 1000.0);
 
     gl.uniformMatrix4fv(matWorldUniformLocaiton, gl.FLASE, worldMatrix);
@@ -241,4 +260,79 @@ export default class App {
     };
     requestAnimationFrame(loop);
   }
+
+  initGUI() {
+
+    this.gui = new dat.GUI();
+    this.config = {
+      topX: verts[0],
+      topY: verts[1],
+      topR: verts[2],
+      topG: verts[3],
+      topB: verts[4],
+      leftX: verts[5],
+      leftY: verts[6],
+      leftR: verts[7],
+      leftG: verts[8],
+      leftB: verts[9],
+      rightX: verts[10],
+      rightY: verts[11],
+      rightR: verts[12],
+      rightG: verts[13],
+      rightB: verts[14],
+    };
+
+    var w = this.canvas.width * 2;
+    var h = this.canvas.height * 2;
+    var wstep = 1 / w;
+    var hstep = 1 / h;
+    var cstep = 1 / 256;
+
+    this.gui.add(this.config, 'topX').min(-1).max(1).step(wstep).onChange((value) => {
+      this.triangleVertices[0] = value;
+    });
+    this.gui.add(this.config, 'topY').min(-1).max(1).step(hstep).onChange((value) => {
+      this.triangleVertices[1] = value;
+    });
+    this.gui.add(this.config, 'topR').min(0).max(1).step(cstep).onChange((value) => {
+      this.triangleVertices[2] = value;
+    });
+    this.gui.add(this.config, 'topG').min(0).max(1).step(cstep).onChange((value) => {
+      this.triangleVertices[3] = value;
+    });
+    this.gui.add(this.config, 'topB').min(0).max(1).step(cstep).onChange((value) => {
+      this.triangleVertices[4] = value;
+    });
+    this.gui.add(this.config, 'leftX').min(-1).max(1).step(wstep).onChange((value) => {
+      this.triangleVertices[5] = value;
+    });
+    this.gui.add(this.config, 'leftY').min(-1).max(1).step(hstep).onChange((value) => {
+      this.triangleVertices[6] = value;
+    });
+    this.gui.add(this.config, 'leftR').min(0).max(1).step(cstep).onChange((value) => {
+      this.triangleVertices[7] = value;
+    });
+    this.gui.add(this.config, 'leftG').min(0).max(1).step(cstep).onChange((value) => {
+      this.triangleVertices[8] = value;
+    });
+    this.gui.add(this.config, 'leftB').min(0).max(1).step(cstep).onChange((value) => {
+      this.triangleVertices[9] = value;
+    });
+    this.gui.add(this.config, 'rightX').min(-1).max(1).step(wstep).onChange((value) => {
+      this.triangleVertices[10] = value;
+    });
+    this.gui.add(this.config, 'rightY').min(-1).max(1).step(hstep).onChange((value) => {
+      this.triangleVertices[11] = value;
+    });
+    this.gui.add(this.config, 'rightR').min(0).max(1).step(cstep).onChange((value) => {
+      this.triangleVertices[12] = value;
+    });
+    this.gui.add(this.config, 'rightG').min(0).max(1).step(cstep).onChange((value) => {
+      this.triangleVertices[13] = value;
+    });
+    this.gui.add(this.config, 'rightB').min(0).max(1).step(cstep).onChange((value) => {
+      this.triangleVertices[14] = value;
+    });
+  }
 }
+
