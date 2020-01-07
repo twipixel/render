@@ -245,6 +245,15 @@ export default class App {
     var angle = 0;
     var loop = function () {
       angle = performance.now() / 1000 / 6 * 2 * Math.PI;
+
+      /**
+       * rotate(out, a, rad, axis) -> {mat4}
+       * http://glmatrix.net/docs/module-mat4.html
+       * out{mat4}: the receiving matrix
+       * a{mat4}: the matrix to rotate (회전할 매트릭스)
+       * rad{number}: the angle to rotate the matrix by (매트릭스를 회전시킬 각도)
+       * axis{vec3}: the axis to rotate around (회전축)
+       */
       mat4.rotate(yRotationMatrix, identityMatrix, angle, [0, 1, 0]);
       mat4.rotate(xRotationMatrix, identityMatrix, angle / 4, [1, 0, 0]);
       mat4.mul(worldMatrix, yRotationMatrix, xRotationMatrix);
@@ -262,77 +271,23 @@ export default class App {
   }
 
   initGUI() {
+    var width = this.canvas.width;
+    var height = this.canvas.height;
 
-    this.gui = new dat.GUI();
-    this.config = {
-      topX: verts[0],
-      topY: verts[1],
-      topR: verts[2],
-      topG: verts[3],
-      topB: verts[4],
-      leftX: verts[5],
-      leftY: verts[6],
-      leftR: verts[7],
-      leftG: verts[8],
-      leftB: verts[9],
-      rightX: verts[10],
-      rightY: verts[11],
-      rightR: verts[12],
-      rightG: verts[13],
-      rightB: verts[14],
+    var xstep = 1 / width;
+    var ystep = 1 / height;
+
+    var gui = this.gui = new dat.GUI();
+    var config = this.config = {
+      worldX: 0,
     };
 
-    var w = this.canvas.width * 2;
-    var h = this.canvas.height * 2;
-    var wstep = 1 / w;
-    var hstep = 1 / h;
-    var cstep = 1 / 256;
+    var world = gui.addFolder('World Space');
+    gui.add(config, 'worldX').min(-1).max(1).step(xstep).onChange((value) => {
 
-    this.gui.add(this.config, 'topX').min(-1).max(1).step(wstep).onChange((value) => {
-      this.triangleVertices[0] = value;
     });
-    this.gui.add(this.config, 'topY').min(-1).max(1).step(hstep).onChange((value) => {
-      this.triangleVertices[1] = value;
-    });
-    this.gui.add(this.config, 'topR').min(0).max(1).step(cstep).onChange((value) => {
-      this.triangleVertices[2] = value;
-    });
-    this.gui.add(this.config, 'topG').min(0).max(1).step(cstep).onChange((value) => {
-      this.triangleVertices[3] = value;
-    });
-    this.gui.add(this.config, 'topB').min(0).max(1).step(cstep).onChange((value) => {
-      this.triangleVertices[4] = value;
-    });
-    this.gui.add(this.config, 'leftX').min(-1).max(1).step(wstep).onChange((value) => {
-      this.triangleVertices[5] = value;
-    });
-    this.gui.add(this.config, 'leftY').min(-1).max(1).step(hstep).onChange((value) => {
-      this.triangleVertices[6] = value;
-    });
-    this.gui.add(this.config, 'leftR').min(0).max(1).step(cstep).onChange((value) => {
-      this.triangleVertices[7] = value;
-    });
-    this.gui.add(this.config, 'leftG').min(0).max(1).step(cstep).onChange((value) => {
-      this.triangleVertices[8] = value;
-    });
-    this.gui.add(this.config, 'leftB').min(0).max(1).step(cstep).onChange((value) => {
-      this.triangleVertices[9] = value;
-    });
-    this.gui.add(this.config, 'rightX').min(-1).max(1).step(wstep).onChange((value) => {
-      this.triangleVertices[10] = value;
-    });
-    this.gui.add(this.config, 'rightY').min(-1).max(1).step(hstep).onChange((value) => {
-      this.triangleVertices[11] = value;
-    });
-    this.gui.add(this.config, 'rightR').min(0).max(1).step(cstep).onChange((value) => {
-      this.triangleVertices[12] = value;
-    });
-    this.gui.add(this.config, 'rightG').min(0).max(1).step(cstep).onChange((value) => {
-      this.triangleVertices[13] = value;
-    });
-    this.gui.add(this.config, 'rightB').min(0).max(1).step(cstep).onChange((value) => {
-      this.triangleVertices[14] = value;
-    });
+
+    world.open();
   }
 }
 
