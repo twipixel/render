@@ -205,30 +205,14 @@ export default class App {
     var matViewUniformLocaiton = gl.getUniformLocation(program, 'mView');
     var matProjUniformLocaiton = gl.getUniformLocation(program, 'mProj');
 
-    var worldMatrix = new Float32Array(16);
-    var viewMatrix = new Float32Array(16);
-    var projMatrix = new Float32Array(16);
-    mat4.identity(worldMatrix);
+    var worldMatrix = this.worldMatrix = mat4.create();
+    var viewMatrix = this.viewMatrix = mat4.create();
+    var projMatrix = this.projMatrix = mat4.create();
 
-    /**
-     * lookAt(out, eye, center, up)
-     * http://glmatrix.net/docs/module-mat4.html
-     * eye: 카메라는 월드 좌표에서 (0, 0, -8) 에 있다.
-     * center: 카메라는 원점을 본다.
-     * up: 머리가 위쪽
-     */
-    mat4.lookAt(viewMatrix, [0, 0, -8], [0, 0, 0], [0, 1, 0]);
+    var view = this.view = [0, 0, -8];
+    mat4.lookAt(viewMatrix, view, [0, 0, 0], [0, 1, 0]);
 
-    /**
-     * http://www.opengl-tutorial.org/kr/beginners-tutorials/tutorial-3-matrices/
-     * perspective(out, fov, aspect, near, far)
-     * http://glmatrix.net/docs/module-mat4.html
-     * fov: 수직방향 시야각
-     * aspect: 화면 비 (w / h)
-     * near: Near clipping plane (근거리 잘라내기 평면)
-     * far: Far clipping plane (원거리 잘라내기 평면)
-     */
-    mat4.perspective(projMatrix, glMatrix.toRadian(45), canvas.width / canvas.height, 0.1, 1000.0);
+    this.perspective();
 
     gl.uniformMatrix4fv(matWorldUniformLocaiton, gl.FLASE, worldMatrix);
     gl.uniformMatrix4fv(matViewUniformLocaiton, gl.FLASE, viewMatrix);
@@ -243,7 +227,24 @@ export default class App {
     var identityMatrix = new Float32Array(16);
     mat4.identity(identityMatrix);
     var angle = 0;
+
     var loop = function () {
+      var config = this.config;
+
+      if (!config) {
+        return;
+      }
+
+      /**
+       * lookAt(out, eye, center, up)
+       * http://glmatrix.net/docs/module-mat4.html
+       * eye: 카메라는 월드 좌표에서 (0, 0, -8) 에 있다.
+       * center: 카메라는 원점을 본다.
+       * up: 머리가 위쪽
+       */
+
+      mat4.lookAt(viewMatrix, [config.viewX, config.viewY, config.viewZ], [0, 0, 0], [0, 1, 0]);
+
       angle = performance.now() / 1000 / 6 * 2 * Math.PI;
 
       /**
@@ -254,10 +255,15 @@ export default class App {
        * rad{number}: the angle to rotate the matrix by (매트릭스를 회전시킬 각도)
        * axis{vec3}: the axis to rotate around (회전축)
        */
+
+      var translate = mat4.create();
+      mat4.translate(translate, translate, vec4.fromValues(config.x, config.y, config.z, 0));
       mat4.rotate(yRotationMatrix, identityMatrix, angle, [0, 1, 0]);
       mat4.rotate(xRotationMatrix, identityMatrix, angle / 4, [1, 0, 0]);
-      mat4.mul(worldMatrix, yRotationMatrix, xRotationMatrix);
+      mat4.mul(worldMatrix, translate, yRotationMatrix, xRotationMatrix);
       gl.uniformMatrix4fv(matWorldUniformLocaiton, gl.FLASE, worldMatrix);
+      gl.uniformMatrix4fv(matViewUniformLocaiton, gl.FLASE, viewMatrix);
+      gl.uniformMatrix4fv(matProjUniformLocaiton, gl.FLASE, projMatrix);
 
       gl.clearColor(0.75, 0.85, 0.8, 1.0);
       // clear() method accepts multiple values
@@ -265,29 +271,82 @@ export default class App {
       gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
       gl.drawElements(gl.TRIANGLES, boxIndices.length, gl.UNSIGNED_SHORT, 0);
 
-      requestAnimationFrame(loop);
+      requestAnimationFrame(loop.bind(this));
     };
-    requestAnimationFrame(loop);
+    requestAnimationFrame(loop.bind(this));
+  }
+
+  perspective() {
+    /**
+     * http://www.opengl-tutorial.org/kr/beginners-tutorials/tutorial-3-matrices/
+     * perspective(out, fov, aspect, near, far)
+     * http://glmatrix.net/docs/module-mat4.html
+     * fov{number}: 수직방향 시야각
+     * aspect{number}: 화면 비 (w / h)
+     * near{number}: Near clipping plane (근거리 잘라내기 평면)
+     * far{number}: Far clipping plane (원거리 잘라내기 평면)
+     */
+    mat4.perspective(this.projMatrix, glMatrix.toRadian(45), canvas.width / canvas.height, 0.1, 1000.0);
+  }
+
+  orthographic() {
+    /**
+     * ortho(out, left, right, botto, top, near, far)
+     * http://glmatrix.net/docs/module-mat4.html
+     * left{number}: 절두체 왼쪽 경계
+     * right{number}: 절두체 오른쪽 경계
+     * bottom{number}: 절두체 하단 경계
+     * top{number}: 절두체 상단 경계
+     * near{number}: 근거리 절두체 경계
+     * far{number}: 원거리 절두체 경계
+     */
+
+    var fov = 0.7;
+    var distance = 4;
+    var scale = Math.tan(fov / 2) * distance; // since ortho is distance invariant, scale by (distance from camera to some reference point)
+    mat4.ortho(this.projMatrix, -scale, scale, -scale, scale, 0.1, 1000.0);
   }
 
   initGUI() {
-    var width = this.canvas.width;
-    var height = this.canvas.height;
+    var gui = this.gui = new dat.GUI({ autoPlace: false });
+    var document = window.frames.document;
+    var holder = document.createElement('div');
+    var style = holder.style;
+    style.right = '0';
+    style.top = '60px';
+    style.position = 'fixed';
+    document.body.appendChild(holder);
+    holder.appendChild(gui.domElement);
 
-    var xstep = 1 / width;
-    var ystep = 1 / height;
+    var view = this.view;
 
-    var gui = this.gui = new dat.GUI();
     var config = this.config = {
-      worldX: 0,
+      x: 0,
+      y: 0,
+      z: 0,
+      viewX: view[0],
+      viewY: view[1],
+      viewZ: view[2],
     };
 
-    var world = gui.addFolder('World Space');
-    gui.add(config, 'worldX').min(-1).max(1).step(xstep).onChange((value) => {
+    var worldFolder = gui.addFolder('World');
+    worldFolder.add(config, 'x', -50, 50);
+    worldFolder.add(config, 'y', -50, 50);
+    worldFolder.add(config, 'z', -50, 50);
+    worldFolder.open();
 
-    });
+    var viewFolder = gui.addFolder('View');
+    viewFolder.add(config, 'viewX', -50, 50);
+    viewFolder.add(config, 'viewY', -50, 50);
+    viewFolder.add(config, 'viewZ', -50, 50);
+    viewFolder.open();
 
-    world.open();
+    var projectionFolder = gui.addFolder('Projection');
+    config.perspective = this.perspective.bind(this);
+    config.orthographic = this.orthographic.bind(this);
+    projectionFolder.add(config, 'perspective');
+    projectionFolder.add(config, 'orthographic');
+    projectionFolder.open();
   }
 }
 

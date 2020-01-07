@@ -142,8 +142,16 @@ export default class App {
 
   initGUI() {
     var vertices = this.triangleVertices;
+    var gui = this.gui = new dat.GUI({ autoPlace: false });
+    var document = window.frames.document;
+    var holder = document.createElement('div');
+    var style = holder.style;
+    style.right = '0';
+    style.top = '60px';
+    style.position = 'fixed';
+    document.body.appendChild(holder);
+    holder.appendChild(gui.domElement);
 
-    var gui = new dat.GUI();
     var config = {
       topX: vertices[0],
       topY: vertices[1],
