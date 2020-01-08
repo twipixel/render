@@ -1,4 +1,3 @@
-
 var vertextShaderText =
   [
     'precision mediump float;',
@@ -289,35 +288,8 @@ export default class App {
     mat4.perspective(this.projMatrix, glMatrix.toRadian(45), canvas.width / canvas.height, 0.1, 1000.0);
   }
 
-  orthographic() {
-    /**
-     * ortho(out, left, right, botto, top, near, far)
-     * http://glmatrix.net/docs/module-mat4.html
-     * left{number}: 절두체 왼쪽 경계
-     * right{number}: 절두체 오른쪽 경계
-     * bottom{number}: 절두체 하단 경계
-     * top{number}: 절두체 상단 경계
-     * near{number}: 근거리 절두체 경계
-     * far{number}: 원거리 절두체 경계
-     */
-
-    var fov = 0.7;
-    var distance = 4;
-    var scale = Math.tan(fov / 2) * distance; // since ortho is distance invariant, scale by (distance from camera to some reference point)
-    mat4.ortho(this.projMatrix, -scale, scale, -scale, scale, 0.1, 1000.0);
-  }
-
   initGUI() {
-    var gui = this.gui = new dat.GUI({ autoPlace: false });
-    var document = window.frames.document;
-    var holder = document.createElement('div');
-    var style = holder.style;
-    style.right = '0';
-    style.top = '60px';
-    style.position = 'fixed';
-    document.body.appendChild(holder);
-    holder.appendChild(gui.domElement);
-
+    var gui = this.gui = new dat.GUI();
     var view = this.view;
 
     var config = this.config = {
@@ -340,13 +312,6 @@ export default class App {
     viewFolder.add(config, 'viewY', -50, 50);
     viewFolder.add(config, 'viewZ', -50, 50);
     viewFolder.open();
-
-    var projectionFolder = gui.addFolder('Projection');
-    config.perspective = this.perspective.bind(this);
-    config.orthographic = this.orthographic.bind(this);
-    projectionFolder.add(config, 'perspective');
-    projectionFolder.add(config, 'orthographic');
-    projectionFolder.open();
   }
 }
 

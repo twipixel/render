@@ -1,19 +1,18 @@
-
-var vertextShaderText =
+var vertexShaderText =
   [
     'precision mediump float;',
     '',
     'attribute vec3 vertPosition;',
-    'attribute vec3 vertColor;',
-    'varying vec3 fragColor;',
+    'attribute vec2 vertTexCoord;',
+    'varying vec2 fragTexCoord;',
     'uniform mat4 mWorld;',
     'uniform mat4 mView;',
     'uniform mat4 mProj;',
     '',
     'void main()',
     '{',
-    ' fragColor = vertColor;',
-    ' gl_Position = mProj * mView * mWorld * vec4(vertPosition, 1.0);',
+    '  fragTexCoord = vertTexCoord;',
+    '  gl_Position = mProj * mView * mWorld * vec4(vertPosition, 1.0);',
     '}'
   ].join('\n');
 
@@ -21,26 +20,29 @@ var fragmentShaderText =
   [
     'precision mediump float;',
     '',
-    'varying vec3 fragColor;',
+    'varying vec2 fragTexCoord;',
+    'uniform sampler2D sampler;',
+    '',
     'void main()',
     '{',
-    ' gl_FragColor = vec4(fragColor, 1.0);',
+    '  gl_FragColor = texture2D(sampler, fragTexCoord);',
     '}'
   ].join('\n');
 
+
 export default class App {
   /**
-   * WebGL Tutorial 02
+   * WebGL Tutorial 03
    * https://www.youtube.com/user/IntroTutorials1/videos
    * https://github.com/sessamekesh/IndigoCS-webgl-tutorials
-   * https://opengameart.org/content/simple-toon-wooden-crate-texture
    */
   constructor() {
-    console.log('WebGL Rotating 3D Cube');
-    this.run();
+    console.log('WebGL Textured Cube');
+    this.init();
+    this.initGUI();
   }
 
-  run() {
+  init() {
     var canvas = this.canvas = document.getElementById('canvas');
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
@@ -67,7 +69,7 @@ export default class App {
     var vertextShader = gl.createShader(gl.VERTEX_SHADER);
     var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
 
-    gl.shaderSource(vertextShader, vertextShaderText);
+    gl.shaderSource(vertextShader, vertexShaderText);
     gl.shaderSource(fragmentShader, fragmentShaderText);
 
     gl.compileShader(vertextShader);
@@ -100,42 +102,42 @@ export default class App {
     // Create buffer
     //
     var boxVertices =
-      [ // X, Y, Z           R, G, B
+      [ // X, Y, Z         U, V
         // Top
-        -1.0, 1.0, -1.0,   0.5, 0.5, 0.5,
-        -1.0, 1.0, 1.0,    0.5, 0.5, 0.5,
-        1.0, 1.0, 1.0,     0.5, 0.5, 0.5,
-        1.0, 1.0, -1.0,    0.5, 0.5, 0.5,
+        -1.0, 1.0, -1.0,   0, 0,
+        -1.0, 1.0, 1.0,    0, 1,
+        1.0, 1.0, 1.0,     1, 1,
+        1.0, 1.0, -1.0,    1, 0,
 
         // Left
-        -1.0, 1.0, 1.0,    0.75, 0.25, 0.5,
-        -1.0, -1.0, 1.0,   0.75, 0.25, 0.5,
-        -1.0, -1.0, -1.0,  0.75, 0.25, 0.5,
-        -1.0, 1.0, -1.0,   0.75, 0.25, 0.5,
+        -1.0, 1.0, 1.0,    0, 0,
+        -1.0, -1.0, 1.0,   1, 0,
+        -1.0, -1.0, -1.0,  1, 1,
+        -1.0, 1.0, -1.0,   0, 1,
 
         // Right
-        1.0, 1.0, 1.0,    0.25, 0.25, 0.75,
-        1.0, -1.0, 1.0,   0.25, 0.25, 0.75,
-        1.0, -1.0, -1.0,  0.25, 0.25, 0.75,
-        1.0, 1.0, -1.0,   0.25, 0.25, 0.75,
+        1.0, 1.0, 1.0,    1, 1,
+        1.0, -1.0, 1.0,   0, 1,
+        1.0, -1.0, -1.0,  0, 0,
+        1.0, 1.0, -1.0,   1, 0,
 
         // Front
-        1.0, 1.0, 1.0,    1.0, 0.0, 0.15,
-        1.0, -1.0, 1.0,    1.0, 0.0, 0.15,
-        -1.0, -1.0, 1.0,    1.0, 0.0, 0.15,
-        -1.0, 1.0, 1.0,    1.0, 0.0, 0.15,
+        1.0, 1.0, 1.0,    1, 1,
+        1.0, -1.0, 1.0,    1, 0,
+        -1.0, -1.0, 1.0,    0, 0,
+        -1.0, 1.0, 1.0,    0, 1,
 
         // Back
-        1.0, 1.0, -1.0,    0.0, 1.0, 0.15,
-        1.0, -1.0, -1.0,    0.0, 1.0, 0.15,
-        -1.0, -1.0, -1.0,    0.0, 1.0, 0.15,
-        -1.0, 1.0, -1.0,    0.0, 1.0, 0.15,
+        1.0, 1.0, -1.0,    0, 0,
+        1.0, -1.0, -1.0,    0, 1,
+        -1.0, -1.0, -1.0,    1, 1,
+        -1.0, 1.0, -1.0,    1, 0,
 
         // Bottom
-        -1.0, -1.0, -1.0,   0.5, 0.5, 1.0,
-        -1.0, -1.0, 1.0,    0.5, 0.5, 1.0,
-        1.0, -1.0, 1.0,     0.5, 0.5, 1.0,
-        1.0, -1.0, -1.0,    0.5, 0.5, 1.0,
+        -1.0, -1.0, -1.0,   1, 1,
+        -1.0, -1.0, 1.0,    1, 0,
+        1.0, -1.0, 1.0,     0, 0,
+        1.0, -1.0, -1.0,    0, 1,
       ];
 
     var boxIndices =
@@ -177,26 +179,42 @@ export default class App {
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(boxIndices), gl.STATIC_DRAW);
 
     var positionAttributionLocation = gl.getAttribLocation(program, 'vertPosition');
-    var colorAttributionLocation = gl.getAttribLocation(program, 'vertColor');
+    var texCoordAttributionLocation = gl.getAttribLocation(program, 'vertTexCoord');
     gl.vertexAttribPointer(
       positionAttributionLocation, // Attribute location
       3, // Number of elements per attribute
       gl.FLOAT, // Type of elements
       gl.FALSE,
-      6 * Float32Array.BYTES_PER_ELEMENT, // Size of an individual vertex
+      5 * Float32Array.BYTES_PER_ELEMENT, // Size of an individual vertex
       0 // Offst from the beginning of a single vertex to this attribute
     );
     gl.vertexAttribPointer(
-      colorAttributionLocation, // Attribute location
-      3, // Number of elements per attribute
+      texCoordAttributionLocation, // Attribute location
+      2, // Number of elements per attribute
       gl.FLOAT, // Type of elements
       gl.FALSE,
-      6 * Float32Array.BYTES_PER_ELEMENT, // Size of an individual vertex
+      5 * Float32Array.BYTES_PER_ELEMENT, // Size of an individual vertex
       3 * Float32Array.BYTES_PER_ELEMENT // Offst from the beginning of a single vertex to this attribute
     );
 
     gl.enableVertexAttribArray(positionAttributionLocation);
-    gl.enableVertexAttribArray(colorAttributionLocation);
+    gl.enableVertexAttribArray(texCoordAttributionLocation);
+
+    //
+    // Create texture
+    //
+    var boxTexture = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, boxTexture);
+    gl.texParameterf(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameterf(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameterf(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameterf(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texImage2D(
+      gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA,
+      gl.UNSIGNED_BYTE,
+      document.getElementById('crate-image')
+    );
+    gl.bindTexture(gl.TEXTURE_2D, null);
 
     // Tell OpenGL state machine which program show
     gl.useProgram(program);
@@ -205,12 +223,14 @@ export default class App {
     var matViewUniformLocaiton = gl.getUniformLocation(program, 'mView');
     var matProjUniformLocaiton = gl.getUniformLocation(program, 'mProj');
 
-    var worldMatrix = new Float32Array(16);
-    var viewMatrix = new Float32Array(16);
-    var projMatrix = new Float32Array(16);
-    mat4.identity(worldMatrix);
-    mat4.lookAt(viewMatrix, [0, 0, -8], [0, 0, 0], [0, 1, 0]);
-    mat4.perspective(projMatrix, glMatrix.toRadian(45), canvas.width / canvas.height, 0.1, 1000.0);
+    var worldMatrix = this.worldMatrix = mat4.create();
+    var viewMatrix = this.viewMatrix = mat4.create();
+    var projMatrix = this.projMatrix = mat4.create();
+
+    var view = this.view = [0, 0, -8];
+    mat4.lookAt(viewMatrix, view, [0, 0, 0], [0, 1, 0]);
+
+    this.perspective();
 
     gl.uniformMatrix4fv(matWorldUniformLocaiton, gl.FLASE, worldMatrix);
     gl.uniformMatrix4fv(matViewUniformLocaiton, gl.FLASE, viewMatrix);
@@ -225,21 +245,96 @@ export default class App {
     var identityMatrix = new Float32Array(16);
     mat4.identity(identityMatrix);
     var angle = 0;
+
     var loop = function () {
+      var config = this.config;
+
+      if (!config) {
+        return;
+      }
+
+      /**
+       * lookAt(out, eye, center, up)
+       * http://glmatrix.net/docs/module-mat4.html
+       * eye: 카메라는 월드 좌표에서 (0, 0, -8) 에 있다.
+       * center: 카메라는 원점을 본다.
+       * up: 머리가 위쪽
+       */
+
+      mat4.lookAt(viewMatrix, [config.viewX, config.viewY, config.viewZ], [0, 0, 0], [0, 1, 0]);
+
       angle = performance.now() / 1000 / 6 * 2 * Math.PI;
+
+      /**
+       * rotate(out, a, rad, axis) -> {mat4}
+       * http://glmatrix.net/docs/module-mat4.html
+       * out{mat4}: the receiving matrix
+       * a{mat4}: the matrix to rotate (회전할 매트릭스)
+       * rad{number}: the angle to rotate the matrix by (매트릭스를 회전시킬 각도)
+       * axis{vec3}: the axis to rotate around (회전축)
+       */
+
+      var translate = mat4.create();
+      mat4.translate(translate, translate, vec4.fromValues(config.x, config.y, config.z, 0));
       mat4.rotate(yRotationMatrix, identityMatrix, angle, [0, 1, 0]);
       mat4.rotate(xRotationMatrix, identityMatrix, angle / 4, [1, 0, 0]);
-      mat4.mul(worldMatrix, yRotationMatrix, xRotationMatrix);
+      mat4.mul(worldMatrix, translate, yRotationMatrix, xRotationMatrix);
       gl.uniformMatrix4fv(matWorldUniformLocaiton, gl.FLASE, worldMatrix);
+      gl.uniformMatrix4fv(matViewUniformLocaiton, gl.FLASE, viewMatrix);
+      gl.uniformMatrix4fv(matProjUniformLocaiton, gl.FLASE, projMatrix);
 
       gl.clearColor(0.75, 0.85, 0.8, 1.0);
       // clear() method accepts multiple values
       // https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/clear
       gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
+
+      gl.bindTexture(gl.TEXTURE_2D, boxTexture);
+      gl.activeTexture(gl.TEXTURE0);
+
       gl.drawElements(gl.TRIANGLES, boxIndices.length, gl.UNSIGNED_SHORT, 0);
 
-      requestAnimationFrame(loop);
+      requestAnimationFrame(loop.bind(this));
     };
-    requestAnimationFrame(loop);
+    requestAnimationFrame(loop.bind(this));
+  }
+
+  perspective() {
+    /**
+     * http://www.opengl-tutorial.org/kr/beginners-tutorials/tutorial-3-matrices/
+     * perspective(out, fov, aspect, near, far)
+     * http://glmatrix.net/docs/module-mat4.html
+     * fov{number}: 수직방향 시야각
+     * aspect{number}: 화면 비 (w / h)
+     * near{number}: Near clipping plane (근거리 잘라내기 평면)
+     * far{number}: Far clipping plane (원거리 잘라내기 평면)
+     */
+    mat4.perspective(this.projMatrix, glMatrix.toRadian(45), canvas.width / canvas.height, 0.1, 1000.0);
+  }
+
+  initGUI() {
+    var gui = this.gui = new dat.GUI();
+    var view = this.view;
+
+    var config = this.config = {
+      x: 0,
+      y: 0,
+      z: 0,
+      viewX: view[0],
+      viewY: view[1],
+      viewZ: view[2],
+    };
+
+    var worldFolder = gui.addFolder('World');
+    worldFolder.add(config, 'x', -50, 50);
+    worldFolder.add(config, 'y', -50, 50);
+    worldFolder.add(config, 'z', -50, 50);
+    worldFolder.open();
+
+    var viewFolder = gui.addFolder('View');
+    viewFolder.add(config, 'viewX', -50, 50);
+    viewFolder.add(config, 'viewY', -50, 50);
+    viewFolder.add(config, 'viewZ', -50, 50);
+    viewFolder.open();
   }
 }
+
