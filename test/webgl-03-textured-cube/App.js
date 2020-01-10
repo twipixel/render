@@ -38,9 +38,19 @@ export default class App {
    */
   constructor() {
     console.log('WebGL Textured Cube');
-    this.init();
-    this.initGUI();
+
+    var img = this.img = document.createElement('img');
+
+    var onload = function() {
+      this.init();
+      this.initGUI();
+    };
+
+    img.onload = onload.bind(this);
+    img.src = '../../test/assets/image/crate.png';
   }
+
+
 
   init() {
     var canvas = this.canvas = document.getElementById('canvas');
@@ -51,12 +61,12 @@ export default class App {
     gl.viewport(0, 0, window.innerWidth, window.innerHeight);
 
     if (!gl) {
-      gl = this.gl = canvas.getContext('experimental-webgl');
+      console.log('WebGL not supported, falling back on experimental-webgl');
+      gl = canvas.getContext('experimental-webgl');
     }
 
     if (!gl) {
-      alert('Your browser dose not support WebGL');
-      return;
+      alert('Your browser does not support WebGL');
     }
 
     gl.clearColor(0.75, 0.85, 0.8, 1.0);
@@ -66,15 +76,18 @@ export default class App {
     gl.frontFace(gl.CCW);
     gl.cullFace(gl.BACK);
 
-    var vertextShader = gl.createShader(gl.VERTEX_SHADER);
+    //
+    // Create shaders
+    //
+    var vertexShader = gl.createShader(gl.VERTEX_SHADER);
     var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
 
-    gl.shaderSource(vertextShader, vertexShaderText);
+    gl.shaderSource(vertexShader, vertexShaderText);
     gl.shaderSource(fragmentShader, fragmentShaderText);
 
-    gl.compileShader(vertextShader);
-    if (!gl.getShaderParameter(vertextShader, gl.COMPILE_STATUS)) {
-      console.error('ERROR compiling vertext shader!', gl.getShaderInfoLog(vertextShader));
+    gl.compileShader(vertexShader);
+    if (!gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS)) {
+      console.error('ERROR compiling vertex shader!', gl.getShaderInfoLog(vertexShader));
       return;
     }
 
@@ -85,7 +98,7 @@ export default class App {
     }
 
     var program = gl.createProgram();
-    gl.attachShader(program, vertextShader);
+    gl.attachShader(program, vertexShader);
     gl.attachShader(program, fragmentShader);
     gl.linkProgram(program);
     if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
@@ -94,7 +107,7 @@ export default class App {
     }
     gl.validateProgram(program);
     if (!gl.getProgramParameter(program, gl.VALIDATE_STATUS)) {
-      console.error('ERROR validating program', gl.getProgramInfoLog(program));
+      console.error('ERROR validating program!', gl.getProgramInfoLog(program));
       return;
     }
 
@@ -102,42 +115,42 @@ export default class App {
     // Create buffer
     //
     var boxVertices =
-      [ // X, Y, Z         U, V
+      [ // X, Y, Z           U, V
         // Top
-        -1.0, 1.0, -1.0,   0, 0,
-        -1.0, 1.0, 1.0,    0, 1,
-        1.0, 1.0, 1.0,     1, 1,
-        1.0, 1.0, -1.0,    1, 0,
+        -1.0, 1.0, -1.0, 0, 0,
+        -1.0, 1.0, 1.0, 0, 1,
+        1.0, 1.0, 1.0, 1, 1,
+        1.0, 1.0, -1.0, 1, 0,
 
         // Left
-        -1.0, 1.0, 1.0,    0, 0,
-        -1.0, -1.0, 1.0,   1, 0,
-        -1.0, -1.0, -1.0,  1, 1,
-        -1.0, 1.0, -1.0,   0, 1,
+        -1.0, 1.0, 1.0, 0, 0,
+        -1.0, -1.0, 1.0, 1, 0,
+        -1.0, -1.0, -1.0, 1, 1,
+        -1.0, 1.0, -1.0, 0, 1,
 
         // Right
-        1.0, 1.0, 1.0,    1, 1,
-        1.0, -1.0, 1.0,   0, 1,
-        1.0, -1.0, -1.0,  0, 0,
-        1.0, 1.0, -1.0,   1, 0,
+        1.0, 1.0, 1.0, 1, 1,
+        1.0, -1.0, 1.0, 0, 1,
+        1.0, -1.0, -1.0, 0, 0,
+        1.0, 1.0, -1.0, 1, 0,
 
         // Front
-        1.0, 1.0, 1.0,    1, 1,
-        1.0, -1.0, 1.0,    1, 0,
-        -1.0, -1.0, 1.0,    0, 0,
-        -1.0, 1.0, 1.0,    0, 1,
+        1.0, 1.0, 1.0, 1, 1,
+        1.0, -1.0, 1.0, 1, 0,
+        -1.0, -1.0, 1.0, 0, 0,
+        -1.0, 1.0, 1.0, 0, 1,
 
         // Back
-        1.0, 1.0, -1.0,    0, 0,
-        1.0, -1.0, -1.0,    0, 1,
-        -1.0, -1.0, -1.0,    1, 1,
-        -1.0, 1.0, -1.0,    1, 0,
+        1.0, 1.0, -1.0, 0, 0,
+        1.0, -1.0, -1.0, 0, 1,
+        -1.0, -1.0, -1.0, 1, 1,
+        -1.0, 1.0, -1.0, 1, 0,
 
         // Bottom
-        -1.0, -1.0, -1.0,   1, 1,
-        -1.0, -1.0, 1.0,    1, 0,
-        1.0, -1.0, 1.0,     0, 0,
-        1.0, -1.0, -1.0,    0, 1,
+        -1.0, -1.0, -1.0, 1, 1,
+        -1.0, -1.0, 1.0, 1, 0,
+        1.0, -1.0, 1.0, 0, 0,
+        1.0, -1.0, -1.0, 0, 1,
       ];
 
     var boxIndices =
@@ -167,9 +180,6 @@ export default class App {
         22, 20, 23
       ];
 
-    // Buffer
-    // GPU에 올리는 2진 데이터 배열
-    // 일반적으로 Buffer는 위치, 법선, Texture 좌표, Vertex 색상 등을 포함하지만 아무것이나 자유롭게 넣어도 된다.
     var boxVertexBufferObject = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, boxVertexBufferObject);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(boxVertices), gl.STATIC_DRAW);
@@ -178,50 +188,51 @@ export default class App {
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, boxIndexBufferObject);
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(boxIndices), gl.STATIC_DRAW);
 
-    var positionAttributionLocation = gl.getAttribLocation(program, 'vertPosition');
-    var texCoordAttributionLocation = gl.getAttribLocation(program, 'vertTexCoord');
+    var positionAttribLocation = gl.getAttribLocation(program, 'vertPosition');
+    var texCoordAttribLocation = gl.getAttribLocation(program, 'vertTexCoord');
     gl.vertexAttribPointer(
-      positionAttributionLocation, // Attribute location
+      positionAttribLocation, // Attribute location
       3, // Number of elements per attribute
       gl.FLOAT, // Type of elements
       gl.FALSE,
       5 * Float32Array.BYTES_PER_ELEMENT, // Size of an individual vertex
-      0 // Offst from the beginning of a single vertex to this attribute
+      0 // Offset from the beginning of a single vertex to this attribute
     );
     gl.vertexAttribPointer(
-      texCoordAttributionLocation, // Attribute location
+      texCoordAttribLocation, // Attribute location
       2, // Number of elements per attribute
       gl.FLOAT, // Type of elements
       gl.FALSE,
       5 * Float32Array.BYTES_PER_ELEMENT, // Size of an individual vertex
-      3 * Float32Array.BYTES_PER_ELEMENT // Offst from the beginning of a single vertex to this attribute
+      3 * Float32Array.BYTES_PER_ELEMENT // Offset from the beginning of a single vertex to this attribute
     );
 
-    gl.enableVertexAttribArray(positionAttributionLocation);
-    gl.enableVertexAttribArray(texCoordAttributionLocation);
+    gl.enableVertexAttribArray(positionAttribLocation);
+    gl.enableVertexAttribArray(texCoordAttribLocation);
 
     //
     // Create texture
     //
     var boxTexture = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, boxTexture);
-    gl.texParameterf(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameterf(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    gl.texParameterf(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-    gl.texParameterf(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
     gl.texImage2D(
       gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA,
       gl.UNSIGNED_BYTE,
-      document.getElementById('crate-image')
+      this.img
     );
+
     gl.bindTexture(gl.TEXTURE_2D, null);
 
-    // Tell OpenGL state machine which program show
+    // Tell OpenGL state machine which program should be active.
     gl.useProgram(program);
 
-    var matWorldUniformLocaiton = gl.getUniformLocation(program, 'mWorld');
-    var matViewUniformLocaiton = gl.getUniformLocation(program, 'mView');
-    var matProjUniformLocaiton = gl.getUniformLocation(program, 'mProj');
+    var matWorldUniformLocation = gl.getUniformLocation(program, 'mWorld');
+    var matViewUniformLocation = gl.getUniformLocation(program, 'mView');
+    var matProjUniformLocation = gl.getUniformLocation(program, 'mProj');
 
     var worldMatrix = this.worldMatrix = mat4.create();
     var viewMatrix = this.viewMatrix = mat4.create();
@@ -230,11 +241,20 @@ export default class App {
     var view = this.view = [0, 0, -8];
     mat4.lookAt(viewMatrix, view, [0, 0, 0], [0, 1, 0]);
 
-    this.perspective();
+    /**
+     * http://www.opengl-tutorial.org/kr/beginners-tutorials/tutorial-3-matrices/
+     * perspective(out, fov, aspect, near, far)
+     * http://glmatrix.net/docs/module-mat4.html
+     * fov{number}: 수직방향 시야각
+     * aspect{number}: 화면 비 (w / h)
+     * near{number}: Near clipping plane (근거리 잘라내기 평면)
+     * far{number}: Far clipping plane (원거리 잘라내기 평면)
+     */
+    mat4.perspective(projMatrix, glMatrix.toRadian(45), canvas.clientWidth / canvas.clientHeight, 0.1, 1000.0);
 
-    gl.uniformMatrix4fv(matWorldUniformLocaiton, gl.FLASE, worldMatrix);
-    gl.uniformMatrix4fv(matViewUniformLocaiton, gl.FLASE, viewMatrix);
-    gl.uniformMatrix4fv(matProjUniformLocaiton, gl.FLASE, projMatrix);
+    gl.uniformMatrix4fv(matWorldUniformLocation, gl.FALSE, worldMatrix);
+    gl.uniformMatrix4fv(matViewUniformLocation, gl.FALSE, viewMatrix);
+    gl.uniformMatrix4fv(matProjUniformLocation, gl.FALSE, projMatrix);
 
     var xRotationMatrix = new Float32Array(16);
     var yRotationMatrix = new Float32Array(16);
@@ -263,6 +283,9 @@ export default class App {
 
       mat4.lookAt(viewMatrix, [config.viewX, config.viewY, config.viewZ], [0, 0, 0], [0, 1, 0]);
 
+      var translate = mat4.create();
+      mat4.translate(translate, translate, vec4.fromValues(config.x, config.y, config.z, 0));
+
       angle = performance.now() / 1000 / 6 * 2 * Math.PI;
 
       /**
@@ -273,19 +296,14 @@ export default class App {
        * rad{number}: the angle to rotate the matrix by (매트릭스를 회전시킬 각도)
        * axis{vec3}: the axis to rotate around (회전축)
        */
-
-      var translate = mat4.create();
-      mat4.translate(translate, translate, vec4.fromValues(config.x, config.y, config.z, 0));
       mat4.rotate(yRotationMatrix, identityMatrix, angle, [0, 1, 0]);
       mat4.rotate(xRotationMatrix, identityMatrix, angle / 4, [1, 0, 0]);
       mat4.mul(worldMatrix, translate, yRotationMatrix, xRotationMatrix);
-      gl.uniformMatrix4fv(matWorldUniformLocaiton, gl.FLASE, worldMatrix);
+      gl.uniformMatrix4fv(matWorldUniformLocation, gl.FALSE, worldMatrix);
       gl.uniformMatrix4fv(matViewUniformLocaiton, gl.FLASE, viewMatrix);
       gl.uniformMatrix4fv(matProjUniformLocaiton, gl.FLASE, projMatrix);
 
       gl.clearColor(0.75, 0.85, 0.8, 1.0);
-      // clear() method accepts multiple values
-      // https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/clear
       gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
 
       gl.bindTexture(gl.TEXTURE_2D, boxTexture);
@@ -296,19 +314,6 @@ export default class App {
       requestAnimationFrame(loop.bind(this));
     };
     requestAnimationFrame(loop.bind(this));
-  }
-
-  perspective() {
-    /**
-     * http://www.opengl-tutorial.org/kr/beginners-tutorials/tutorial-3-matrices/
-     * perspective(out, fov, aspect, near, far)
-     * http://glmatrix.net/docs/module-mat4.html
-     * fov{number}: 수직방향 시야각
-     * aspect{number}: 화면 비 (w / h)
-     * near{number}: Near clipping plane (근거리 잘라내기 평면)
-     * far{number}: Far clipping plane (원거리 잘라내기 평면)
-     */
-    mat4.perspective(this.projMatrix, glMatrix.toRadian(45), canvas.width / canvas.height, 0.1, 1000.0);
   }
 
   initGUI() {

@@ -244,6 +244,9 @@ export default class App {
 
       mat4.lookAt(viewMatrix, [config.viewX, config.viewY, config.viewZ], [0, 0, 0], [0, 1, 0]);
 
+      var translate = mat4.create();
+      mat4.translate(translate, translate, vec4.fromValues(config.x, config.y, config.z, 0));
+
       angle = performance.now() / 1000 / 6 * 2 * Math.PI;
 
       /**
@@ -254,9 +257,6 @@ export default class App {
        * rad{number}: the angle to rotate the matrix by (매트릭스를 회전시킬 각도)
        * axis{vec3}: the axis to rotate around (회전축)
        */
-
-      var translate = mat4.create();
-      mat4.translate(translate, translate, vec4.fromValues(config.x, config.y, config.z, 0));
       mat4.rotate(yRotationMatrix, identityMatrix, angle, [0, 1, 0]);
       mat4.rotate(xRotationMatrix, identityMatrix, angle / 4, [1, 0, 0]);
       mat4.mul(worldMatrix, translate, yRotationMatrix, xRotationMatrix);
