@@ -119,7 +119,7 @@ export default class App {
     // Create buffer
     //
     var boxVertices =
-      [ // X, Y, Z           U, V
+      [ // X, Y, Z, U, V
         // Top
         -1.0, 1.0, -1.0, 0, 0,
         -1.0, 1.0, 1.0, 0, 1,
@@ -218,17 +218,37 @@ export default class App {
     // Create texture
     //
     var boxTexture = gl.createTexture();
+
+    /**
+     * 텍스쳐 로딩
+     * void gl.bindTexutre(target, texture);
+     * https://developer.mozilla.org/ko/docs/Web/API/WebGL_API/Tutorial/Using_textures_in_WebGL
+     *
+     * target
+     * gl.TEXTURE_2D: 2차원 텍스쳐
+     * gl.TEXTURE_CUBE_MAP: 큐브맵 텍스쳐
+     *
+     */
     gl.bindTexture(gl.TEXTURE_2D, boxTexture);
+
+    /**
+     * void gl.texImage2D(target, level, internalformat, format, type, ImageData? pixels)
+     * https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/texImage2D
+     * https://ozlael.tistory.com/45
+     *
+     * target
+     * GLenum
+     * gl.TEXTURE_2D,
+     * gl.TEXTURE_CUBE_MAP_POSITIVE_X ... 시리즈
+     *
+     * level
+     * GLint 세부 사항의 레벨을 지정, 레벨으 0은 기본 이미지 레벨, 레벨 n은 n 번째 밉맵 감소 레벨
+     */
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.img);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-    gl.texImage2D(
-      gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA,
-      gl.UNSIGNED_BYTE,
-      this.img
-    );
-
     gl.bindTexture(gl.TEXTURE_2D, null);
 
     // Tell OpenGL state machine which program should be active.
