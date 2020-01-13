@@ -11,6 +11,7 @@ var vertexShaderText =
     '',
     'void main()',
     '{',
+    // UV 좌표 전달
     '  fragTexCoord = vertTexCoord;',
     '  gl_Position = mProj * mView * mWorld * vec4(vertPosition, 1.0);',
     '}'
@@ -25,6 +26,8 @@ var fragmentShaderText =
     '',
     'void main()',
     '{',
+    // 샘플러가 판단하기에 프래그먼트의 위치에 가장 잘 맞아 떨어진다고 여겨지는
+    // 텍셀(texel, 텍스쳐 내부에 있는 픽셀)값에 따라서 프래그먼트의 색상값을 계산
     '  gl_FragColor = texture2D(sampler, fragTexCoord);',
     '}'
   ].join('\n');
@@ -35,6 +38,9 @@ export default class App {
    * WebGL Tutorial 03
    * https://www.youtube.com/user/IntroTutorials1/videos
    * https://github.com/sessamekesh/IndigoCS-webgl-tutorials
+   *
+   * 텍스쳐 설명
+   * https://inhibitor1217.github.io/2019/04/27/webgl-texture.html
    */
   constructor() {
     console.log('WebGL Textured Cube');
@@ -49,8 +55,6 @@ export default class App {
     img.onload = onload.bind(this);
     img.src = '../../test/assets/image/crate.png';
   }
-
-
 
   init() {
     var canvas = this.canvas = document.getElementById('canvas');
@@ -300,14 +304,16 @@ export default class App {
       mat4.rotate(xRotationMatrix, identityMatrix, angle / 4, [1, 0, 0]);
       mat4.mul(worldMatrix, translate, yRotationMatrix, xRotationMatrix);
       gl.uniformMatrix4fv(matWorldUniformLocation, gl.FALSE, worldMatrix);
-      gl.uniformMatrix4fv(matViewUniformLocaiton, gl.FLASE, viewMatrix);
-      gl.uniformMatrix4fv(matProjUniformLocaiton, gl.FLASE, projMatrix);
+      gl.uniformMatrix4fv(matViewUniformLocation, gl.FLASE, viewMatrix);
+      gl.uniformMatrix4fv(matProjUniformLocation, gl.FLASE, projMatrix);
 
       gl.clearColor(0.75, 0.85, 0.8, 1.0);
       gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
 
+      // GL은 32개의 텍스쳐 레지스터를 제공. 그 중 첫번째 레지스터는 gl.TEXTURE0 입니다.
+      // 텍스쳐를 사용하기 위해 전에 읽어온 텍스쳐를 gl.TEXTURE0에 바인딩합니다.
+      // gl.activeTexture(gl.TEXTURE0);
       gl.bindTexture(gl.TEXTURE_2D, boxTexture);
-      gl.activeTexture(gl.TEXTURE0);
 
       gl.drawElements(gl.TRIANGLES, boxIndices.length, gl.UNSIGNED_SHORT, 0);
 
