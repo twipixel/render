@@ -22,13 +22,22 @@ var fragmentShaderText =
     'precision mediump float;',
     '',
     'varying vec2 fragTexCoord;',
-    'uniform sampler2D sampler;',
+    // 'uniform sampler2D sampler;',
+    'uniform sampler2D crate;',
+    'uniform sampler2D awesomeface;',
     '',
     'void main()',
     '{',
     // 샘플러가 판단하기에 프래그먼트의 위치에 가장 잘 맞아 떨어진다고 여겨지는
     // 텍셀(texel, 텍스쳐 내부에 있는 픽셀)값에 따라서 프래그먼트의 색상값을 계산
-    '  gl_FragColor = texture2D(sampler, fragTexCoord);',
+    // '  gl_FragColor = texture2D(crate, fragTexCoord);',
+    '  gl_FragColor = texture2D(awesomeface, fragTexCoord);',
+
+    // '  vec4 color0 = texture2D(crate, fragTexCoord);',
+    // '  vec4 color1 = texture2D(awesomeface, fragTexCoord);',
+    // '  gl_FragColor = vec4(color0.rgb, 0.5) + vec4(color1.rgb, 0.5);',
+    // '  gl_FragColor = vec4(color0.rgb, 0.5);',
+    // '  gl_FragColor = vec4(color1.rgb, 0.5);',
     '}'
   ].join('\n');
 
@@ -45,15 +54,27 @@ export default class App {
   constructor() {
     console.log('WebGL Textured Cube');
 
-    var img = this.img = document.createElement('img');
-
-    var onload = function() {
-      this.init();
-      this.initGUI();
+    var loadTexture = (src) => {
+      return new Promise((resolve, reject) => {
+        var img = document.createElement('img');
+        img.onload = function() {
+          resolve(img);
+        };
+        img.onerror = function() {
+          reject(img);
+        };
+        img.src = src;
+      });
     };
 
-    img.onload = onload.bind(this);
-    img.src = '../../test/assets/image/crate.png';
+    Promise.all([
+      loadTexture('../../test/assets/image/crate.png'),
+      loadTexture('../../test/assets/image/awesomeface.png'),
+    ]).then((textures) => {
+      this.textures = textures;
+      this.init();
+      this.initGUI();
+    });
   }
 
   init() {
@@ -218,8 +239,7 @@ export default class App {
     //
     // Create texture
     //
-    var boxTexture = gl.createTexture();
-
+    var crateTexture = gl.createTexture();
     /**
      * 텍스쳐 로딩
      * void gl.bindTexutre(target, texture);
@@ -230,8 +250,15 @@ export default class App {
      * gl.TEXTURE_CUBE_MAP: 큐브맵 텍스쳐
      *
      */
-    gl.bindTexture(gl.TEXTURE_2D, boxTexture);
-
+    gl.bindTexture(gl.TEXTURE_2D, crateTexture);
+    // s좌표계 (텍셀좌표계) 감싸기(반복) 방지
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    // t좌표계 (텍셀좌표계) 감싸기(반복) 방지
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    // 축소할 때 LINEAR 필터 적용 (minifying, 선형필터, 즉 주변 픽셀과 혼합하여 텍셀을 보여줌)
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    // 확대할 때 LINEAR 필터 적용 (magnifying)
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
     /**
      * void gl.texImage2D(target, level, internalformat, format, type, ImageData? pixels)
      * https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/texImage2D
@@ -259,16 +286,22 @@ export default class App {
      * 다음 개체 중 하나의 텍스처 픽셀 소스로 사용 가능
      * ArrayBufferView, ImageData, HTMLImageElement, HTMLCanvasElement, HTMLVideoElement, ImageBitmap
      */
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.img);
-    // s좌표계 (텍셀좌표계) 감싸기(반복) 방지
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.textures[0]);
+    // gl.bindTexture(gl.TEXTURE_2D, null);
+
+    var aweasomefaceTexture = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, aweasomefaceTexture);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    // t좌표계 (텍셀좌표계) 감싸기(반복) 방지
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    // 축소할 때 LINEAR 필터 적용 (minifying, 선형필터, 즉 주변 픽셀과 혼합하여 텍셀을 보여줌)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-    // 확대할 때 LINEAR 필터 적용 (magnifying)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-    gl.bindTexture(gl.TEXTURE_2D, null);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.textures[1]);
+    // gl.bindTexture(gl.TEXTURE_2D, null);
+
+    var sampler1TextureLocation = gl.getUniformLocation(program, 'sampler1');
+    var sampler2TextureLocation = gl.getUniformLocation(program, 'sampler2');
+    gl.uniform1i(sampler1TextureLocation, 0);
+    gl.uniform1i(sampler2TextureLocation, 1);
 
     // Tell OpenGL state machine which program should be active.
     gl.useProgram(program);
@@ -364,8 +397,10 @@ export default class App {
 
       // GL은 32개의 텍스쳐 레지스터를 제공. 그 중 첫번째 레지스터는 gl.TEXTURE0 입니다.
       // 텍스쳐를 사용하기 위해 전에 읽어온 텍스쳐를 gl.TEXTURE0에 바인딩합니다.
-      // gl.activeTexture(gl.TEXTURE0);
-      gl.bindTexture(gl.TEXTURE_2D, boxTexture);
+      gl.activeTexture(gl.TEXTURE0);
+      gl.bindTexture(gl.TEXTURE_2D, crateTexture);
+      gl.activeTexture(gl.TEXTURE1);
+      gl.bindTexture(gl.TEXTURE_2D, aweasomefaceTexture);
 
       gl.drawElements(gl.TRIANGLES, boxIndices.length, gl.UNSIGNED_SHORT, 0);
 
