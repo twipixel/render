@@ -31,13 +31,12 @@ var fragmentShaderText =
     // 샘플러가 판단하기에 프래그먼트의 위치에 가장 잘 맞아 떨어진다고 여겨지는
     // 텍셀(texel, 텍스쳐 내부에 있는 픽셀)값에 따라서 프래그먼트의 색상값을 계산
     // '  gl_FragColor = texture2D(crate, fragTexCoord);',
-    '  gl_FragColor = texture2D(awesomeface, fragTexCoord);',
+    // '  gl_FragColor = texture2D(awesomeface, fragTexCoord);',
 
-    // '  vec4 color0 = texture2D(crate, fragTexCoord);',
-    // '  vec4 color1 = texture2D(awesomeface, fragTexCoord);',
-    // '  gl_FragColor = vec4(color0.rgb, 0.5) + vec4(color1.rgb, 0.5);',
-    // '  gl_FragColor = vec4(color0.rgb, 0.5);',
-    // '  gl_FragColor = vec4(color1.rgb, 0.5);',
+    '  vec4 color0 = texture2D(crate, fragTexCoord);',
+    '  vec4 color1 = texture2D(awesomeface, fragTexCoord);',
+    '  gl_FragColor = color0 * color1;',
+    // '  gl_FragColor = vec4(color0.rgb, 0.5) * vec4(color1.rgb, 0.5);',
     '}'
   ].join('\n');
 
@@ -298,11 +297,6 @@ export default class App {
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.textures[1]);
     // gl.bindTexture(gl.TEXTURE_2D, null);
 
-    var sampler1TextureLocation = gl.getUniformLocation(program, 'sampler1');
-    var sampler2TextureLocation = gl.getUniformLocation(program, 'sampler2');
-    gl.uniform1i(sampler1TextureLocation, 0);
-    gl.uniform1i(sampler2TextureLocation, 1);
-
     // Tell OpenGL state machine which program should be active.
     gl.useProgram(program);
 
@@ -394,6 +388,11 @@ export default class App {
 
       gl.clearColor(0.75, 0.85, 0.8, 1.0);
       gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
+
+      var crateTextureLocation = gl.getUniformLocation(program, 'crate');
+      var awesomefaceTextureLocation = gl.getUniformLocation(program, 'awesomeface');
+      gl.uniform1i(crateTextureLocation, 0);
+      gl.uniform1i(awesomefaceTextureLocation, 1);
 
       // GL은 32개의 텍스쳐 레지스터를 제공. 그 중 첫번째 레지스터는 gl.TEXTURE0 입니다.
       // 텍스쳐를 사용하기 위해 전에 읽어온 텍스쳐를 gl.TEXTURE0에 바인딩합니다.
