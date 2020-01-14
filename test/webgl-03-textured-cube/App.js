@@ -211,6 +211,7 @@ export default class App {
       3 * Float32Array.BYTES_PER_ELEMENT // Offset from the beginning of a single vertex to this attribute
     );
 
+    // 버텍스 쉐이더에서 사용할 수 있도록 활성화
     gl.enableVertexAttribArray(positionAttribLocation);
     gl.enableVertexAttribArray(texCoordAttribLocation);
 
@@ -243,11 +244,29 @@ export default class App {
      *
      * level
      * GLint 세부 사항의 레벨을 지정, 레벨으 0은 기본 이미지 레벨, 레벨 n은 n 번째 밉맵 감소 레벨
+     *
+     * internalformat
+     * 텍스처의 색상 구성 요소를 지정
+     *
+     * format
+     * 텍셀 데이터의 포맷을 지정. WebGL 1에서 internalformat 과 동일해야함
+     *
+     * type
+     * 텍셀 데이터의 데이터 유형을 지정.
+     * gl.UNSIGNED_BYTE: 채널당 8비트 gl.RGBA
+     *
+     * pixels
+     * 다음 개체 중 하나의 텍스처 픽셀 소스로 사용 가능
+     * ArrayBufferView, ImageData, HTMLImageElement, HTMLCanvasElement, HTMLVideoElement, ImageBitmap
      */
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.img);
+    // s좌표계 (텍셀좌표계) 감싸기(반복) 방지
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    // t좌표계 (텍셀좌표계) 감싸기(반복) 방지
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    // 축소할 때 LINEAR 필터 적용 (minifying, 선형필터, 즉 주변 픽셀과 혼합하여 텍셀을 보여줌)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    // 확대할 때 LINEAR 필터 적용 (magnifying)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
     gl.bindTexture(gl.TEXTURE_2D, null);
 
@@ -276,6 +295,19 @@ export default class App {
      */
     mat4.perspective(projMatrix, glMatrix.toRadian(45), canvas.clientWidth / canvas.clientHeight, 0.1, 1000.0);
 
+    /**
+     * uniformMatrix4fv(location, transpose, value)\
+     * https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/uniformMatrix
+     *
+     * locaiton
+     * getUniformLocaiton() 으로 가져온 location 값 (WebGLUniformLocaiton)
+     *
+     * transpose
+     * Matrix transpose 할지 여부 지정. 반드시 FALSE 여야 합니다.
+     *
+     * value
+     * Float32Array 또는 스퀀시 GLfloat 값
+     */
     gl.uniformMatrix4fv(matWorldUniformLocation, gl.FALSE, worldMatrix);
     gl.uniformMatrix4fv(matViewUniformLocation, gl.FALSE, viewMatrix);
     gl.uniformMatrix4fv(matProjUniformLocation, gl.FALSE, projMatrix);
