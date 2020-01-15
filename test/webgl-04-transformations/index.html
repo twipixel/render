@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WebGL - Textured Cube</title>
+    <style type="text/css">
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #191919;
+        }
+    </style>
+</head>
+<body>
+<script type="text/javascript" src="./../../external/vendor/gl-matrix.js"></script>
+<script type="text/javascript" src="./../../external/vendor/dat.gui.js"></script>
+<script type="text/javascript" src="./../../external/lib/test.common.js"></script>
+<script>
+    (function() {
+        // commons 은 build 할 때 생성합니다.
+        addScriptToHeadSync('../bundle/commons.js');
+        const loc = window.location.pathname
+            , dir = loc.substring(0, loc.lastIndexOf('/'))
+            , folders = dir.split('/')
+            , currentFolder = folders[folders.length - 1];
+        addScriptToBodySync(`../bundle/${currentFolder}.js`);
+    })();
+</script>
+<div id="root">
+    <canvas id="canvas"></canvas>
+    <!--<img id="crate-image" src="image/crate.png"></img>-->
+    <!--<img id="crate-image" src="../assets/image/crate.png" width="0" height="0"></img>-->
+</div>
+</body>
+</html>

@@ -1,3 +1,5 @@
+import loadTextures from '../../src/utils/loadTextures';
+
 var vertexShaderText =
   [
     'precision mediump float;',
@@ -53,23 +55,10 @@ export default class App {
   constructor() {
     console.log('WebGL Textured Cube');
 
-    var loadTexture = (src) => {
-      return new Promise((resolve, reject) => {
-        var img = document.createElement('img');
-        img.onload = function() {
-          resolve(img);
-        };
-        img.onerror = function() {
-          reject(img);
-        };
-        img.src = src;
-      });
-    };
-
-    Promise.all([
-      loadTexture('../../test/assets/image/crate.png'),
-      loadTexture('../../test/assets/image/awesomeface.png'),
-    ]).then((textures) => {
+    loadTextures([
+      '../../test/assets/image/crate.png',
+      '../../test/assets/image/awesomeface.png'
+    ]).then(textures => {
       this.textures = textures;
       this.init();
       this.initGUI();
@@ -286,7 +275,7 @@ export default class App {
      * ArrayBufferView, ImageData, HTMLImageElement, HTMLCanvasElement, HTMLVideoElement, ImageBitmap
      */
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.textures[0]);
-    // gl.bindTexture(gl.TEXTURE_2D, null);
+    gl.bindTexture(gl.TEXTURE_2D, null);
 
     var aweasomefaceTexture = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, aweasomefaceTexture);
@@ -295,7 +284,10 @@ export default class App {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.textures[1]);
-    // gl.bindTexture(gl.TEXTURE_2D, null);
+    gl.bindTexture(gl.TEXTURE_2D, null);
+
+    var crateTextureLocation = gl.getUniformLocation(program, 'crate');
+    var awesomefaceTextureLocation = gl.getUniformLocation(program, 'awesomeface');
 
     // Tell OpenGL state machine which program should be active.
     gl.useProgram(program);
@@ -389,8 +381,7 @@ export default class App {
       gl.clearColor(0.75, 0.85, 0.8, 1.0);
       gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
 
-      var crateTextureLocation = gl.getUniformLocation(program, 'crate');
-      var awesomefaceTextureLocation = gl.getUniformLocation(program, 'awesomeface');
+
       gl.uniform1i(crateTextureLocation, 0);
       gl.uniform1i(awesomefaceTextureLocation, 1);
 
