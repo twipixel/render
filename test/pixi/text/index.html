@@ -14,18 +14,18 @@
 </head>
 <body>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/5.1.5/pixi.js"></script>
-<script type="text/javascript" src="./../../external/vendor/dat.gui.js"></script>
-<script type="text/javascript" src="./../../external/lib/test.common.js"></script>
+<script type="text/javascript" src="./../../../external/vendor/dat.gui.js"></script>
+<script type="text/javascript" src="./../../../external/lib/test.common.js"></script>
 <script>
-    (function() {
-        // commons 은 build 할 때 생성합니다.
-        addScriptToHeadSync('../bundle/commons.js');
-        const loc = window.location.pathname
-            , dir = loc.substring(0, loc.lastIndexOf('/'))
-            , folders = dir.split('/')
-            , currentFolder = folders[folders.length - 1];
-        addScriptToBodySync(`../bundle/${currentFolder}.js`);
-    })();
+  (function() {
+    // commons 은 build 할 때 생성합니다.
+    addScriptToHeadSync('../../bundle/commons.js');
+    const loc = window.location.pathname
+      , dir = loc.substring(0, loc.lastIndexOf('/'))
+      , folders = dir.split('/')
+      , currentFolder = folders[folders.length - 1];
+    addScriptToBodySync(`../../bundle/${currentFolder}.js`);
+  })();
 </script>
 <div id="root"></div>
 </body>

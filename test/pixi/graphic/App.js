@@ -2,7 +2,7 @@ import getTimeLabel from './../../../src/console/getTimeLabel';
 
 export default class App {
   constructor() {
-    console.log('pixi-text');
+    console.log('graphic');
     this.initialize();
   }
 

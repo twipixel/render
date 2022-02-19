@@ -70,13 +70,29 @@
                     </ul>-->
                     <a href="javascript:" class="dcjq-parent active">
                         <!--<i class="fa fa-desktop"></i>-->
+                        <span>Math</span>
+                    </a>
+                    <ul class="sub">
+                        <li><a href="math/equation/index.html" target="frame">Equation</a></li>
+                    </ul>
+                </li>
+                <li class="sub-menu dcjq-parent-li">
+                    <!--<a href="javascript:" class="dcjq-parent active">
+                        <span>BASIC</span>
+                    </a>
+                    <ul class="sub">
+                        <li><a href="basic-event/index.html" target="frame">Event</a></li>
+                        <li><a href="basic-display/index.html" target="frame">Display</a></li>
+                    </ul>-->
+                    <a href="javascript:" class="dcjq-parent active">
+                        <!--<i class="fa fa-desktop"></i>-->
                         <span>PIXI</span>
                     </a>
                     <ul class="sub">
-                        <li><a href="pixi-event/index.html" target="frame">Event</a></li>
-                        <li><a href="pixi-ticker/index.html" target="frame">Ticker</a></li>
-                        <li><a href="pixi-text/index.html" target="frame">Text</a></li>
-                        <li><a href="pixi-interaction/index.html" target="frame">Interaction</a></li>
+                        <li><a href="pixi/event/index.html" target="frame">Event</a></li>
+                        <li><a href="pixi/ticker/index.html" target="frame">Ticker</a></li>
+                        <li><a href="pixi/text/index.html" target="frame">Text</a></li>
+                        <li><a href="pixi/interaction/index.html" target="frame">Interaction</a></li>
                     </ul>
                 </li>
                 <li class="sub-menu dcjq-parent-li">
@@ -92,7 +108,7 @@
                         <span>WebGLFundamentals</span>
                     </a>
                     <ul class="sub">
-                        <li><a href="gl-fundamentals/index.html" target="frame">WebGL 기초</a></li>
+                        <li><a href="webgl-fundamentals/basic/index.html" target="frame">WebGL 기초</a></li>
                     </ul>
                 </li>
                 <li class="sub-menu dcjq-parent-li">
@@ -108,26 +124,10 @@
                         <span>WebGL</span>
                     </a>
                     <ul class="sub">
-                        <li><a href="webgl-01-simple-triangle/index.html" target="frame">01.Simple Triangle</a></li>
-                        <li><a href="webgl-02-rotating-3d-cube/index.html" target="frame">02.Rotating 3D Cube</a></li>
-                        <li><a href="webgl-03-textured-cube/index.html" target="frame">03.Textured Cube</a></li>
-                        <li><a href="webgl-04-transformations/index.html" target="frame">04.Transformations</a></li>
-                    </ul>
-                </li>
-                <li class="sub-menu dcjq-parent-li">
-                    <!--<a href="javascript:" class="dcjq-parent active">
-                        <span>BASIC</span>
-                    </a>
-                    <ul class="sub">
-                        <li><a href="basic-event/index.html" target="frame">Event</a></li>
-                        <li><a href="basic-display/index.html" target="frame">Display</a></li>
-                    </ul>-->
-                    <a href="javascript:" class="dcjq-parent active">
-                        <!--<i class="fa fa-desktop"></i>-->
-                        <span>Math</span>
-                    </a>
-                    <ul class="sub">
-                        <li><a href="math-equation/index.html" target="frame">Equation</a></li>
+                        <li><a href="webgl/01-simple-triangle/index.html" target="frame">01.Simple Triangle</a></li>
+                        <li><a href="webgl/02-rotating-3d-cube/index.html" target="frame">02.Rotating 3D Cube</a></li>
+                        <li><a href="webgl/03-textured-cube/index.html" target="frame">03.Textured Cube</a></li>
+                        <li><a href="webgl/04-transformations/index.html" target="frame">04.Transformations</a></li>
                     </ul>
                 </li>
             </ul>
@@ -177,8 +177,7 @@
         frame.name = 'frame';
         frame.frameBorder = 0;
         frame.scrolling = 'no';
-        frame.src = 'gl-fundamentals/index.html';
-        // frame.src = 'test-equation/index.html';
+        frame.src = 'webgl-fundamentals/basic/index.html';
         parent.appendChild(frame);
 
     }());

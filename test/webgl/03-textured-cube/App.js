@@ -1,4 +1,4 @@
-import loadTextures from '../../src/utils/loadTextures';
+import loadTextures from '../../../src/utils/loadTextures';
 
 var vertexShaderText =
   [
@@ -56,8 +56,8 @@ export default class App {
     console.log('WebGL Textured Cube');
 
     loadTextures([
-      '../../test/assets/image/crate.png',
-      '../../test/assets/image/awesomeface.png'
+      '../../../test/assets/image/crate.png',
+      '../../../test/assets/image/awesomeface.png'
     ]).then(textures => {
       this.textures = textures;
       this.init();
